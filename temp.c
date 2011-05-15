@@ -177,7 +177,7 @@ void temp_sensor_tick() {
 							if (pgm_read_word(&(temptable[table_num][j][0])) > temp) {
 								// Thermistor table is already in 14.2 fixed point
 								#ifndef	EXTRUDER
-								if (debug_flags & DEBUG_PID)
+								if (DEBUG_PID && (debug_flags & DEBUG_PID))
 									sersendf_P(PSTR("pin:%d Raw ADC:%d table entry: %d"),temp_sensors[i].temp_pin,temp,j);
 								#endif
 								// Linear interpolating temperature value
@@ -204,14 +204,14 @@ void temp_sensor_tick() {
 								//                                (x₁ - x₀)
 									(pgm_read_word(&(temptable[table_num][j][0])) - pgm_read_word(&(temptable[table_num][j-1][0])));
 								#ifndef	EXTRUDER
-								if (debug_flags & DEBUG_PID)
+								if (DEBUG_PID && (debug_flags & DEBUG_PID))
 									sersendf_P(PSTR(" temp:%d.%d"),temp/4,(temp%4)*25);
 								#endif
 								break;
 							}
 						}
 						#ifndef	EXTRUDER
-						if (debug_flags & DEBUG_PID)
+						if (DEBUG_PID && (debug_flags & DEBUG_PID))
 							sersendf_P(PSTR(" Sensor:%d\n"),i);
 						#endif
 
@@ -271,18 +271,17 @@ void temp_sensor_tick() {
 					break;
 			}
 			temp_sensors_runtime[i].last_read_temp = temp;
+		}
+		if (labs((int16_t)(temp_sensors_runtime[i].last_read_temp - temp_sensors_runtime[i].target_temp)) < (TEMP_HYSTERESIS*4)) {
+			if (temp_sensors_runtime[i].temp_residency < (TEMP_RESIDENCY_TIME*100))
+				temp_sensors_runtime[i].temp_residency++;
+		}
+		else {
+			temp_sensors_runtime[i].temp_residency = 0;
+		}
 
-			if (labs((int16_t)(temp - temp_sensors_runtime[i].target_temp)) < (TEMP_HYSTERESIS*4)) {
-				if (temp_sensors_runtime[i].temp_residency < (TEMP_RESIDENCY_TIME*100))
-					temp_sensors_runtime[i].temp_residency++;
-			}
-			else {
-				temp_sensors_runtime[i].temp_residency = 0;
-			}
-
-			if (temp_sensors[i].heater < NUM_HEATERS) {
-				heater_tick(temp_sensors[i].heater, i, temp_sensors_runtime[i].last_read_temp, temp_sensors_runtime[i].target_temp);
-			}
+		if (temp_sensors[i].heater < NUM_HEATERS) {
+			heater_tick(temp_sensors[i].heater, i, temp_sensors_runtime[i].last_read_temp, temp_sensors_runtime[i].target_temp);
 		}
 	}
 }
@@ -339,7 +338,7 @@ void temp_print(temp_sensor_t index) {
 
 	c = (temp_sensors_runtime[index].last_read_temp & 3) * 25;
 
-	sersendf_P(PSTR("T:%u.%u"), temp_sensors_runtime[index].last_read_temp >> 2, c);
+	sersendf_P(PSTR("\nT:%u.%u"), temp_sensors_runtime[index].last_read_temp >> 2, c);
 	#ifdef HEATER_BED
 		uint8_t b = 0;
 		b = (temp_sensors_runtime[HEATER_BED].last_read_temp & 3) * 25;

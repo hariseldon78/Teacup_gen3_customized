@@ -158,7 +158,7 @@ void process_gcode_command() {
 				queue_wait();
 				// delay
 				for (;next_target.P > 0;next_target.P--) {
-					ifclock(CLOCK_FLAG_10MS) {
+					ifclock(clock_flag_10ms) {
 						clock_10ms();
 					}
 					delay_ms(1);
@@ -273,7 +273,7 @@ void process_gcode_command() {
 					return;
 		}
 		#ifdef	DEBUG
-			if (debug_flags & DEBUG_POSITION)
+			if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION))
 				print_queue();
 		#endif
 	}
@@ -362,7 +362,8 @@ void process_gcode_command() {
 
 			// M109- set temp and wait
 			case 109:
-				temp_set(next_target.P, next_target.S);
+				if (next_target.seen_S)
+					temp_set(next_target.P, next_target.S);
 				if (next_target.S) {
 					power_on();
 					enable_heater();
@@ -392,7 +393,7 @@ void process_gcode_command() {
 				// M113- extruder PWM
 			// M114- report XYZEF to host
 			case 114:
-				sersendf_P(PSTR("X:%ld,Y:%ld,Z:%ld,E:%ld,F:%ld"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
+				sersendf_P(PSTR("X:%lq,Y:%lq,Z:%lq,E:%lq,F:%ld"), current_position.X * ((int32_t) UM_PER_STEP_X), current_position.Y * ((int32_t) UM_PER_STEP_Y), current_position.Z * ((int32_t) UM_PER_STEP_Z), current_position.E * ((int32_t) UM_PER_STEP_E), current_position.F);
 				// newline is sent from gcode_parse after we return
 				break;
 			// M115- capabilities string

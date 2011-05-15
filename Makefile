@@ -67,10 +67,10 @@ PROGPORT = /dev/arduino
 # atmega328p, 644p, 1280
 PROGBAUD = 57600
 # atmega 2560
-#PROGBAUD = 115200
+# PROGBAUD = 115200
 
 # at least mega2560 needs stk500v2
-PROGID = stk500v1
+PROGID = arduino
 
 ##############################################################################
 #                                                                            #
@@ -80,7 +80,7 @@ PROGID = stk500v1
 
 PROGRAM = mendel
 
-SOURCES = $(PROGRAM).c dda.c gcode_parse.c gcode_process.c timer.c temp.c sermsg.c dda_queue.c watchdog.c debug.c sersendf.c heater.c analog.c delay.c intercom.c pinio.c clock.c home.c crc.c
+SOURCES = $(PROGRAM).c dda.c gcode_parse.c gcode_process.c timer.c temp.c sermsg.c dda_queue.c watchdog.c debug.c sersendf.c heater.c analog.c intercom.c pinio.c clock.c home.c crc.c delay.c
 
 ARCH = avr-
 CC = $(ARCH)gcc
@@ -106,7 +106,7 @@ endif
 
 OBJ = $(patsubst %.c,%.o,${SOURCES})
 
-.PHONY: all program clean size subdirs
+.PHONY: all program clean size subdirs program-fuses doc functionsbysize
 .PRECIOUS: %.o %.elf
 
 all: config.h subdirs $(PROGRAM).hex $(PROGRAM).lst $(PROGRAM).sym size
@@ -155,6 +155,9 @@ config.h: config.h.dist
 
 doc: Doxyfile *.c *.h
 	doxygen $<
+
+functionsbysize: $(OBJ)
+	@avr-objdump -h $^ | grep '\.text\.' | perl -ne '/\.text\.(\S+)\s+([0-9a-f]+)/ && printf "%u\t%s\n", eval("0x$$2"), $$1;' | sort -n
 
 %.o: %.c config.h Makefile
 	@echo "  CC        $@"

@@ -5,21 +5,21 @@
 
 #include	"config.h"
 
+// Used in distance calculation during DDA setup
+/// micrometers per step X
+#define	UM_PER_STEP_X		1000L / ((uint32_t) STEPS_PER_MM_X)
+/// micrometers per step Y
+#define	UM_PER_STEP_Y		1000L / ((uint32_t) STEPS_PER_MM_Y)
+/// micrometers per step Z
+#define	UM_PER_STEP_Z		1000L / ((uint32_t) STEPS_PER_MM_Z)
+/// micrometers per step E
+#define	UM_PER_STEP_E		1000L / ((uint32_t) STEPS_PER_MM_E)
+
 #ifdef ACCELERATION_REPRAP
 	#ifdef ACCELERATION_RAMPING
 		#error Cant use ACCELERATION_REPRAP and ACCELERATION_RAMPING together.
 	#endif
 #endif
-
-/*
-	enums
-*/
-// wether we accelerate, run at full speed, break down, etc.
-typedef enum {
-	RAMP_UP,
-	RAMP_MAX,
-	RAMP_DOWN
-} ramp_state_t;
 
 /*
 	types
@@ -78,6 +78,12 @@ typedef struct {
 	int32_t						z_counter; ///< counter for total_steps vs this axis, used for bresenham calculations.
 	int32_t						e_counter; ///< counter for total_steps vs this axis, used for bresenham calculations.
 
+	// step counters
+	uint32_t					x_steps; ///< number of steps on X axis
+	uint32_t					y_steps; ///< number of steps on Y axis
+	uint32_t					z_steps; ///< number of steps on Z axis
+	uint32_t					e_steps; ///< number of steps on E axis
+
 	/// total number of steps: set to \f$\max(\Delta x, \Delta y, \Delta z, \Delta e)\f$
 	uint32_t					total_steps;
 
@@ -88,26 +94,16 @@ typedef struct {
 	int32_t						n; ///< precalculated step time offset variable. At every step we calculate \f$c = c - (2 c / n)\f$; \f$n+=4\f$. See http://www.embedded.com/columns/technicalinsights/56800129?printable=true for full description
 	#endif
 	#ifdef ACCELERATION_RAMPING
-	/// start of down-ramp, intitalized with total_steps / 2
-	uint32_t					ramp_steps;
+	/// number of steps accelerating
+	uint32_t					rampup_steps;
+	/// number of last step before decelerating
+	uint32_t					rampdown_steps;
 	/// counts actual steps done
 	uint32_t					step_no;
 	/// 24.8 fixed point timer value, maximum speed
 	uint32_t					c_min;
 	/// tracking variable
 	int32_t						n;
-	/// keep track of whether we're ramping up, down, or plateauing
-	ramp_state_t			ramp_state;
-	#endif
-	#ifdef ACCELERATION_TEMPORAL
-	/// time between steps on X axis
-	uint32_t					x_step_interval;
-	/// time between steps on Y axis
-	uint32_t					y_step_interval;
-	/// time between steps on Z axis
-	uint32_t					z_step_interval;
-	/// time between steps on E axis
-	uint32_t					e_step_interval;
 	#endif
 } DDA;
 
@@ -116,7 +112,8 @@ typedef struct {
 */
 
 /// steptimeout is set to zero when we step, and increases over time so we can turn the motors off when they've been idle for a while
-extern uint8_t steptimeout;
+/// It is also used inside and outside of interrupts, which is why it has been made volatile
+extern volatile uint8_t steptimeout;
 
 /// startpoint holds the endpoint of the most recently created DDA, so we know where the next one created starts. could also be called last_endpoint
 extern TARGET startpoint;
@@ -142,5 +139,8 @@ void dda_start(DDA *dda)																						__attribute__ ((hot));
 
 // DDA takes one step (called from timer interrupt)
 void dda_step(DDA *dda)																							__attribute__ ((hot));
+
+// update current_position
+void update_position(void);
 
 #endif	/* _DDA_H */
