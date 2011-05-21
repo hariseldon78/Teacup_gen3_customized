@@ -44,3 +44,4 @@ uint16_t temp_get(temp_sensor_t index);
 void temp_print(temp_sensor_t index);
 
 #endif	/* _TEMP_H */
+

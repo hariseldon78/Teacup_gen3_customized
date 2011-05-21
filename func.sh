@@ -92,7 +92,8 @@ MENDEL_DEV=/dev/arduino
 
 # Initialize serial port settings
 mendel_setup() {
-	stty 115200 raw ignbrk -hup -echo ixoff < $MENDEL_DEV
+#	stty 115200 raw ignbrk -hup -echo ixoff < $MENDEL_DEV
+	stty 57600 raw ignbrk -hup -echo ixoff < $MENDEL_DEV
 }
 
 # Reset the arduino by dripping DTR

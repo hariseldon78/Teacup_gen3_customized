@@ -10,6 +10,10 @@
 #include	"config.h"
 #include	"delay.h"
 
+#ifdef HOST 
+#include "serial.h" 
+#endif
+
 #if	 (defined TEMP_INTERCOM) || (defined EXTRUDER)
 #define		INTERCOM_BAUD			57600
 
@@ -98,6 +102,10 @@ void start_send(void) {
 	intercom_flags = (intercom_flags & ~FLAG_TX_FINISHED) | FLAG_TX_IN_PROGRESS;
 	SREG = sreg;
 
+
+//        serial_writechar('>');
+
+
 	// enable transmit pin
 	enable_transmit();
 
@@ -163,8 +171,12 @@ ISR(USART_RX_vect)
 			rxcrc ^= c;
 		// stuff byte into structure
 		_rx.data[packet_pointer++] = c;
+
+                serial_writechar('<');
+
 		// last byte?
 		if (packet_pointer >= sizeof(intercom_packet_t)) {
+
 			// reset pointer
 			packet_pointer = 0;
 

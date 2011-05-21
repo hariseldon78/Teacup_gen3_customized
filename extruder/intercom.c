@@ -103,7 +103,7 @@ void start_send(void) {
 
 	// set start byte
 	tx.packet.start = START;
-
+        tx.packet.debug = 222;
 	// set packet type
 	tx.packet.control_word = 105;
 	tx.packet.control_index = 0;
@@ -126,6 +126,7 @@ void start_send(void) {
 	#else
 		UCSR0B |= MASK(UDRIE0);
 	#endif
+
 }
 
 /*
@@ -168,13 +169,18 @@ ISR(USART_RX_vect)
 			// reset pointer
 			packet_pointer = 0;
 
+
+
 			#ifndef HOST
 			if (rxcrc == _rx.packet.crc &&
 			    _rx.packet.controller_num == THIS_CONTROLLER_NUM){
 			#else
 			if (rxcrc == _rx.packet.crc){
 			#endif
-				// correct crc copy packet
+	/*  digitalWrite(DEBUG_PIN, 1);
+          delay(2);
+          digitalWrite(DEBUG_PIN, 0);*/
+			// correct crc copy packet
 				static uint8_t i;
 				for (i = 0; i < (sizeof(intercom_packet_t) ); i++) {
 					rx.data[i] = _rx.data[i];
@@ -242,3 +248,4 @@ ISR(USART_UDRE_vect)
 }
 
 #endif	/* TEMP_INTERCOM */
+

@@ -20,3 +20,4 @@ void wd_reset(void);
 
 #endif	/* USE_WATCHDOG */
 #endif	/* _WATCHDOG_H */
+

@@ -22,6 +22,7 @@
 #include	"clock.h"
 #include	"config.h"
 #include	"home.h"
+#include        "intercom.h"
 
 /// the current tool
 uint8_t tool;
@@ -398,7 +399,7 @@ void process_gcode_command() {
 				break;
 			// M115- capabilities string
 			case 115:
-				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d"), 1, NUM_TEMP_SENSORS, NUM_HEATERS);
+				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%d"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
 				// newline is sent from gcode_parse after we return
 				break;
 			// M116 - Wait for all temperatures and other slowly-changing variables to arrive at their set values.

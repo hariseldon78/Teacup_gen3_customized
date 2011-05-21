@@ -32,6 +32,7 @@ typedef struct {
 		float			control_data_float;
 		uint16_t	temp[2];
 	};
+        uint8_t         debug;
 	uint8_t		err;	///< error code, if any
 	uint8_t		crc;	///< crc for packet verification. packets with bad crc are simply ignored
 } intercom_packet_t;
@@ -83,3 +84,4 @@ extern volatile uint8_t	intercom_flags;
 
 
 #endif	/* _INTERCOM_H */
+

@@ -58,3 +58,4 @@ void wd_reset() {
 }
 
 #endif /* USE_WATCHDOG */
+

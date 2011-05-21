@@ -20,8 +20,8 @@
 #define	OC2A				DIO11
 #define	OC2B				DIO3
 
-#define	DEBUG_LED		AIO5
-
+//#define	DEBUG_LED		AIO5
+#define DEBUG_LED               DIO13
 /*
 pins
 */
@@ -306,3 +306,4 @@ pins
 #define PD7_WPORT		PORTD
 #define PD7_DDR			DDRD
 #define PD7_PWM			NULL
+
