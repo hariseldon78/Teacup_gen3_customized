@@ -251,6 +251,9 @@ void init(void) {
         // if any of the temp sensors in your config.h use analog interface
         analog_init();
 
+	// set up dda
+	dda_init();
+
         // set up temperature inputs
         temp_init();
 
