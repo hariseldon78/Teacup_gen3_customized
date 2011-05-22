@@ -271,16 +271,10 @@ int main (void)
         }
 #endif
 #if DEBUG_MODE == 2
-      /*  SET_OUTPUT(RX_ENABLE_PIN);
-        WRITE(RX_ENABLE_PIN,0);
-
-        SET_OUTPUT(TX_ENABLE_PIN);
-        WRITE(TX_ENABLE_PIN,0);
-
-        SET_INPUT(RXD);*/
+//OK scollegando A
         intercom_init();
         io_init();
-        WRITE(RX_ENABLE_PIN,1);
+        WRITE(RX_ENABLE_PIN,0);
         WRITE(RXD,0);
         SET_INPUT(RXD);
         WRITE(TXD,0);
@@ -293,6 +287,7 @@ int main (void)
         }                
 #endif
 #if DEBUG_MODE == 3
+//OK scollegando A
         io_init();
         for(;;){
                 enable_transmit();
@@ -305,7 +300,20 @@ int main (void)
                 delay_ms(10000);
         }
 #endif
-
+#if DEBUG_MODE == 5
+//OK scollegando A
+        io_init();
+        for(;;){
+                enable_transmit();
+//                WRITE(TXD,0);
+                WRITE(DEBUG_LED, 1);
+                delay_ms(10000);
+                disable_transmit();
+//                WRITE(TXD,0);
+                WRITE(DEBUG_LED, 0);
+                delay_ms(10000);
+        }
+#endif
 #endif
 }
 
