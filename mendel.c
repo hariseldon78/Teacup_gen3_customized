@@ -304,8 +304,7 @@ int main (void)
         }
 #endif
 #if DEBUG_MODE == 2
-//OK scollegando A
-#ifdef HOST___
+#ifdef HOST__
         serial_init();
         io_init();
         sei();
@@ -322,7 +321,7 @@ int main (void)
                         WRITE(DEBUG_LED, 1);
                 else
                         WRITE(DEBUG_LED,0);
-#ifdef HOST___
+#ifdef HOST__
                 uint8_t d=DDRD;
                 uint8_t p=PORTD;
                 sersendf_P(PSTR("DDRD: %d PORTD: %d\n"),d,p);   
@@ -331,21 +330,19 @@ int main (void)
         }                
 #endif
 #if DEBUG_MODE == 3
-//OK scollegando A
-        io_init();
-        //                enable_transmit();
+        enable_transmit();
+        WRITE(TX_ENABLE_PIN,1);
+        WRITE(RX_ENABLE_PIN,1);
+        SET_OUTPUT(TX_ENABLE_PIN);
+        SET_OUTPUT(RX_ENABLE_PIN);
+        SET_OUTPUT(TXD1);
         for(;;){
-                WRITE(TXD,1);
-                enable_transmit();
-                //          WRITE(TXD1,1);
+                WRITE(TXD1,1);
                 WRITE(DEBUG_LED, 1);
-                delay_ms(2000);
-                
-                WRITE(TXD,0);
-                disable_transmit();
-                //          WRITE(TXD1,0);
+                delay_ms(5000);
+                WRITE(TXD1,0);
                 WRITE(DEBUG_LED, 0);
-                delay_ms(2000);
+                delay_ms(5000);
         }
 #endif
 #if DEBUG_MODE == 4

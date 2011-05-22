@@ -271,14 +271,11 @@ int main (void)
         }
 #endif
 #if DEBUG_MODE == 2
-//OK scollegando A
         intercom_init();
         io_init();
         WRITE(RX_ENABLE_PIN,0);
         WRITE(RXD,0);
         SET_INPUT(RXD);
-        WRITE(TXD,0);
-        SET_INPUT(TXD);
         for(;;){
                 if (READ(RXD))
                         WRITE(DEBUG_LED, 1);
@@ -287,17 +284,21 @@ int main (void)
         }                
 #endif
 #if DEBUG_MODE == 3
-//OK scollegando A
-        io_init();
+     //   init();
+        UCSR0B=0;
+        enable_transmit();
+        WRITE(TX_ENABLE_PIN,1);
+        WRITE(RX_ENABLE_PIN,1);
+        SET_OUTPUT(TX_ENABLE_PIN);
+        SET_OUTPUT(RX_ENABLE_PIN);
+        SET_OUTPUT(TXD);
         for(;;){
-                enable_transmit();
                 WRITE(TXD,1);
                 WRITE(DEBUG_LED, 1);
-                delay_ms(10000);
-                disable_transmit();
+                delay_ms(30000);
                 WRITE(TXD,0);
                 WRITE(DEBUG_LED, 0);
-                delay_ms(10000);
+                delay_ms(30000);
         }
 #endif
 #if DEBUG_MODE == 5
