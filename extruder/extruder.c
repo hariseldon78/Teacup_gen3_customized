@@ -2,6 +2,7 @@
 #include	<string.h>
 
 #include	<avr/interrupt.h>
+static uint8_t deb=0;
 
 #include	"intercom.h"
 #include	"analog.h"
@@ -160,7 +161,7 @@ ISR(PCINT0_vect) {
 void init(void) {
 
         // set up watchdog
-        wd_init();
+       wd_init();
 
         // setup analog reading
         analog_init();
@@ -195,8 +196,11 @@ void init(void) {
 int main (void)
 {
 #ifndef DEBUG_MODE
-        uint8_t deb=0;
+        UCSR0B=0;
+//        uint8_t deb=0;
+        uint32_t a=0;
 
+        SET_OUTPUT(DEBUG_LED);
         init();
 
         enable_heater();
@@ -204,8 +208,12 @@ int main (void)
         // main loop
         for (;;)
         {
-                /*               digitalWrite(DEBUG_PIN, deb);
-                 deb=!deb;*/
+                if (++a>100000)
+                {
+                        a=0;
+//                        WRITE(DEBUG_LED,++deb%2);
+                        WRITE(DEBUG_LED,0);
+                }       
 
                 wd_reset();
 
@@ -215,8 +223,8 @@ int main (void)
                 ifclock(CLOCK_FLAG_10MS) {
                         // check temperatures and manage heaters
                         temp_sensor_tick();
-                }
 
+                }
                 // check if we've had a new intercom packet
                 if (intercom_flags & FLAG_NEW_RX) {
                         intercom_flags &= ~FLAG_NEW_RX;
@@ -261,13 +269,68 @@ int main (void)
         }
 #else
 #if DEBUG_MODE == 1
-        io_init();
+        init();
+        enable_heater();
+        uint8_t deb=0;
+        uint8_t count=0;
+
         int i;
         for (i=0;;i++){
-                WRITE(DEBUG_LED, 1);
-                delay_ms(i);
-                WRITE(DEBUG_LED, 0);
-                delay_ms(i);
+                wd_reset();
+                motor_pwm = analog_read(TRIM_POT_CHANNEL) >> 2;
+                ifclock(CLOCK_FLAG_10MS) {
+                        // check temperatures and manage heaters
+                        temp_sensor_tick();
+                        if (++count>100)
+                        {
+                                count=0;
+                                SET_OUTPUT(DEBUG_LED);
+                                WRITE(DEBUG_LED, (++deb) % 2);
+                        }
+
+                }
+
+                // check if we've had a new intercom packet
+                if (intercom_flags & FLAG_NEW_RX) {
+                        intercom_flags &= ~FLAG_NEW_RX;
+
+                        /*        switch (rx.packet.control_word) {
+                         // M105- read temperatures
+                         case 105:
+                         send_temperature(0, temp_get(0));
+                         temp_set(0, read_temperature(0));
+                         send_temperature(1, temp_get(1));
+                         temp_set(1, read_temperature(1));
+                         start_send();
+                         break;
+                         // M130 - set PID P factor
+                         case 130:
+                         pid_set_p(rx.packet.control_index, rx.packet.control_data_int32);
+                         // M131 - set PID I factor
+                         case 131:
+                         pid_set_i(rx.packet.control_index, rx.packet.control_data_int32);
+                         // M132 - set PID D factor
+                         case 132:
+                         pid_set_d(rx.packet.control_index, rx.packet.control_data_int32);
+                         // M133 - set PID I limit
+                         case 133:
+                         pid_set_i_limit(rx.packet.control_index, rx.packet.control_data_int32);
+                         // M134 - save PID values to eeprom
+                         case 134:
+                         heater_save_settings();
+                         break;
+                         case 299:
+                         digitalWrite(DEBUG_PIN, 1);
+                         delay(2);
+                         digitalWrite(DEBUG_PIN, 0);
+                         break;
+                         
+                         }*/
+                }
+                /*                WRITE(DEBUG_LED, 1);
+                 delay_ms(3);
+                 WRITE(DEBUG_LED, 0);
+                 delay_ms(3);*/
         }
 #endif
 #if DEBUG_MODE == 2
@@ -284,7 +347,7 @@ int main (void)
         }                
 #endif
 #if DEBUG_MODE == 3
-     //   init();
+        //   init();
         UCSR0B=0;
         enable_transmit();
         WRITE(TX_ENABLE_PIN,1);
@@ -302,21 +365,22 @@ int main (void)
         }
 #endif
 #if DEBUG_MODE == 5
-//OK scollegando A
+        //OK scollegando A
         io_init();
         for(;;){
                 enable_transmit();
-//                WRITE(TXD,0);
+                //                WRITE(TXD,0);
                 WRITE(DEBUG_LED, 1);
                 delay_ms(10000);
                 disable_transmit();
-//                WRITE(TXD,0);
+                //                WRITE(TXD,0);
                 WRITE(DEBUG_LED, 0);
                 delay_ms(10000);
         }
 #endif
 #endif
 }
+
 
 
 

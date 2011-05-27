@@ -253,6 +253,8 @@ void heater_tick(heater_t h, temp_sensor_t t, uint16_t current_temp, uint16_t ta
 			pid_output = BANG_BANG_ON;
 	#endif
 
+
+
 	#ifdef	HEATER_SANITY_CHECK
 	// check heater sanity
 	// implementation is a moving window with some slow-down to compensate for thermal mass

@@ -172,9 +172,7 @@ ISR(USART_RX_vect)
 		// stuff byte into structure
 		_rx.data[packet_pointer++] = c;
 
-                serial_writechar('<');
-
-		// last byte?
+                // last byte?
 		if (packet_pointer >= sizeof(intercom_packet_t)) {
 
 			// reset pointer
@@ -186,6 +184,8 @@ ISR(USART_RX_vect)
 			#else
 			if (rxcrc == _rx.packet.crc){
 			#endif
+                                WRITE(DEBUG_LED, 1);
+                
 				// correct crc copy packet
 				static uint8_t i;
 				for (i = 0; i < (sizeof(intercom_packet_t) ); i++) {
