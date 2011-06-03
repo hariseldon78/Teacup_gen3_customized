@@ -110,3 +110,4 @@ void serwrite_int32_vf(int32_t v, uint8_t fp) {
 
 	serwrite_uint32_vf(v, fp);
 }
+

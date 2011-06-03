@@ -642,3 +642,4 @@ pins
 #define PF7_WPORT		PORTF
 #define PF7_PWM			NULL
 #define PF7_DDR			DDRF
+

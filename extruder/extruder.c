@@ -161,7 +161,7 @@ ISR(PCINT0_vect) {
 void init(void) {
 
         // set up watchdog
-       wd_init();
+        wd_init();
 
         // setup analog reading
         analog_init();
@@ -197,7 +197,7 @@ int main (void)
 {
 #ifndef DEBUG_MODE
         UCSR0B=0;
-//        uint8_t deb=0;
+        //        uint8_t deb=0;
         uint32_t a=0;
 
         SET_OUTPUT(DEBUG_LED);
@@ -211,8 +211,8 @@ int main (void)
                 if (++a>100000)
                 {
                         a=0;
-//                        WRITE(DEBUG_LED,++deb%2);
-                        WRITE(DEBUG_LED,0);
+                        //                        WRITE(DEBUG_LED,++deb%2);
+               //         WRITE(DEBUG_LED,0);
                 }       
 
                 wd_reset();
@@ -237,6 +237,16 @@ int main (void)
                                 send_temperature(1, temp_get(1));
                                 temp_set(1, read_temperature(1));
                                 start_send();
+                                break;
+                        case 106:
+#ifdef FAN_PIN
+                                WRITE(FAN_PIN, 1);
+#endif
+                                break;
+                        case 107:
+#ifdef FAN_PIN
+                                WRITE(FAN_PIN, 0);
+#endif
                                 break;
                                 // M130 - set PID P factor
                         case 130:
@@ -380,6 +390,7 @@ int main (void)
 #endif
 #endif
 }
+
 
 
 

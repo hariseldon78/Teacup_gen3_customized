@@ -48,3 +48,4 @@ void queue_flush(void);
 void queue_wait(void);
 
 #endif	/* _DDA_QUEUE */
+

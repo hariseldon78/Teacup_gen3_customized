@@ -253,3 +253,4 @@ void serial_writestr_P(PGM_P data)
 	while ((r = pgm_read_byte(&data[i++])))
 		serial_writechar(r);
 }
+

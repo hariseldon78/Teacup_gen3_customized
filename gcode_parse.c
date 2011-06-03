@@ -407,3 +407,4 @@ void request_resend(void) {
 	serwrite_uint8(next_target.N);
 	serial_writechar('\n');
 }
+

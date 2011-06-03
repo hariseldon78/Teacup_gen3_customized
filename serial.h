@@ -28,3 +28,4 @@ void serial_writeblock_P(PGM_P data, int datalen);
 void serial_writestr_P(PGM_P data);
 
 #endif	/* _SERIAL_H */
+

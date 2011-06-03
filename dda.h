@@ -162,3 +162,4 @@ void dda_step(DDA *dda)																							__attribute__ ((hot));
 void update_position(void);
 
 #endif	/* _DDA_H */
+

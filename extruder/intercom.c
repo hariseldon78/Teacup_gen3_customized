@@ -177,7 +177,6 @@ ISR(USART_RX_vect)
 			#else
 			if (rxcrc == _rx.packet.crc){
 			#endif
-                                WRITE(DEBUG_LED, 1);
 			// correct crc copy packet
 				static uint8_t i;
 				for (i = 0; i < (sizeof(intercom_packet_t) ); i++) {

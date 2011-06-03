@@ -8,7 +8,7 @@
 
 // Thermistor lookup table, generated with --num-temps=50 and trimmed in lower temperature ranges.
 // You may be able to improve the accuracy of this table in various ways.
-//   1. Measure the actual resistance of the resistor. It's "nominally" 4.7K, but that's �� 5%.
+//   1. Measure the actual resistance of the resistor. It's "nominally" 4.7K, but that's ± 5%.
 //   2. Measure the actual beta of your thermistor:http://reprap.org/wiki/MeasuringThermistorBeta
 //   3. Generate more table entries than you need, then trim down the ones in uninteresting ranges. (done)
 // In either case you'll have to regenerate this table, which requires python, which is difficult to install on windows.

@@ -31,3 +31,4 @@ void setTimer(uint32_t delay);
 void timer_stop(void);
 
 #endif	/* _TIMER_H */
+

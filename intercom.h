@@ -74,6 +74,7 @@ uint8_t get_err(void);
 /// if host, send packet to extruder
 /// if extruder, return packet to host
 void start_send(void);
+void start_send_custom(uint8_t word_to_send);
 
 #define	FLAG_RX_IN_PROGRESS	1
 #define	FLAG_TX_IN_PROGRESS	2
@@ -84,3 +85,4 @@ extern volatile uint8_t	intercom_flags;
 
 
 #endif	/* _INTERCOM_H */
+

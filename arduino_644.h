@@ -498,3 +498,4 @@ pins
 #define PD7_WPORT		PORTD
 #define PD7_DDR			DDRD
 #define PD7_PWM			&OCR2A
+

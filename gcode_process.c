@@ -266,7 +266,10 @@ void process_gcode_command() {
 					if (next_target.seen_Z)
 						home_z_positive();
 					break;
-
+                                // G163 - Home sweet home
+                                case 163:
+                                        home_all();
+                                        break;
 					// unknown gcode: spit an error
 				default:
 					sersendf_P(PSTR("E: Bad G-code %d"), next_target.G);
@@ -352,6 +355,9 @@ void process_gcode_command() {
 				#ifdef HEATER_FAN
 					heater_set(HEATER_FAN, 255);
 				#endif
+                                #ifdef FAN_INTERCOM
+                                        start_send_custom(106);
+                                #endif
 				break;
 			// M107- fan off
 			case 9:
@@ -359,6 +365,9 @@ void process_gcode_command() {
 				#ifdef HEATER_FAN
 					heater_set(HEATER_FAN, 0);
 				#endif
+                                #ifdef FAN_INTERCOM
+                                        start_send_custom(107);
+                                #endif
 				break;
 
 			// M109- set temp and wait
@@ -399,7 +408,8 @@ void process_gcode_command() {
 				break;
 			// M115- capabilities string
 			case 115:
-				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%d"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
+				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%d\n"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
+                                temp_print_all_sensors();
 				// newline is sent from gcode_parse after we return
 				break;
 			// M116 - Wait for all temperatures and other slowly-changing variables to arrive at their set values.
@@ -483,14 +493,37 @@ void process_gcode_command() {
 				serial_writestr_P(PSTR("Echo on"));
 				// newline is sent from gcode_parse after we return
 				break;
+			case 242:
+				debug_flags &= ~DEBUG_DDA;
+				serial_writestr_P(PSTR("DDA off"));
+				// newline is sent from gcode_parse after we return
+				break;
+				// M241- echo on
+			case 243:
+				debug_flags |= DEBUG_DDA;
+				serial_writestr_P(PSTR("DDA on"));
+				// newline is sent from gcode_parse after we return
+				break;
+			case 244:
+				debug_flags &= ~DEBUG_POSITION;
+				serial_writestr_P(PSTR("POSITION off"));
+				// newline is sent from gcode_parse after we return
+				break;
+				// M241- echo on
+			case 245:
+				debug_flags |= DEBUG_POSITION;
+				serial_writestr_P(PSTR("POSITION on"));
+				// newline is sent from gcode_parse after we return
+				break;
 
 			// DEBUG: return current position, end position, queue
 			case 250:
-				sersendf_P(PSTR("{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lu}\t{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lu}\t"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F, movebuffer[mb_tail].c, movebuffer[mb_tail].endpoint.X, movebuffer[mb_tail].endpoint.Y, movebuffer[mb_tail].endpoint.Z, movebuffer[mb_tail].endpoint.E, movebuffer[mb_tail].endpoint.F,
+				sersendf_P(PSTR("{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lu}\t{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lu}\t"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F, /*movebuffer[mb_tail].c*/0, movebuffer[mb_tail].endpoint.X, movebuffer[mb_tail].endpoint.Y, movebuffer[mb_tail].endpoint.Z, movebuffer[mb_tail].endpoint.E, movebuffer[mb_tail].endpoint.F,
 					#ifdef ACCELERATION_REPRAP
 						movebuffer[mb_tail].end_c
 					#else
-						movebuffer[mb_tail].c
+						/*movebuffer[mb_tail].c*/
+                                                0
 					#endif
 					);
 

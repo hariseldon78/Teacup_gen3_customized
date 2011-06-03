@@ -5,3 +5,4 @@ void clock_250ms(void);
 void clock_10ms(void);
 
 #endif	/* _CLOCK_H */
+

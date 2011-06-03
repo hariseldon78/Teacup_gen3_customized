@@ -72,3 +72,4 @@ void gcode_parse_char(uint8_t c);
 void request_resend(void);
 
 #endif	/* _GCODE_PARSE_H */
+

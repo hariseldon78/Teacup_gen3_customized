@@ -12,3 +12,4 @@ extern uint8_t next_tool;
 void process_gcode_command(void);
 
 #endif	/* _GCODE_PROCESS_H */
+

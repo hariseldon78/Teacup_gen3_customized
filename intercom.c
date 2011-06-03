@@ -94,6 +94,11 @@ uint8_t get_err() {
 }
 
 void start_send(void) {
+        start_send_custom(105);
+}
+        
+void start_send_custom(uint8_t word_to_send)
+{
 	uint8_t txcrc = 0, i;
 
 	// atomically update flags
@@ -113,7 +118,7 @@ void start_send(void) {
 	tx.packet.start = START;
 
 	// set packet type
-	tx.packet.control_word = 105;
+	tx.packet.control_word =  word_to_send;
 	tx.packet.control_index = 0;
 
 	// calculate CRC for outgoing packet
@@ -254,3 +259,4 @@ ISR(USART_UDRE_vect)
 }
 
 #endif	/* TEMP_INTERCOM */
+

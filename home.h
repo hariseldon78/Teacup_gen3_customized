@@ -1,6 +1,6 @@
 #ifndef	_HOME_H
 
-void home(void);
+void home_all(void);
 
 void home_x_negative(void);
 void home_x_positive(void);
@@ -10,3 +10,4 @@ void home_z_negative(void);
 void home_z_positive(void);
 
 #endif	/* _HOME_H */
+
