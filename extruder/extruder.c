@@ -81,8 +81,10 @@ void io_init(void) {
 void motor_init(void) {
         //Enable an interrupt to be triggered when the step pin changes
         //This will be PCIE0
+//#ifndef MOTOR_OVER_INTERCOM
         PCICR = MASK(PCIE0);
         PCMSK0 = MASK(PCINT2);
+//#endif
 }
 
 ISR(PCINT0_vect) {
