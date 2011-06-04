@@ -7,14 +7,16 @@
 
 void debug_led_init();
 void debug_led_step();
-void debug_led_set_pattern(uint16_t pattern);
+
+// if ticks==0 disable auto_off feature
+void debug_led_set_pattern(uint16_t pattern, uint8_t ticks);
 extern uint16_t debug_led_pattern;
 
 #else
 
 #define debug_led_init() do {} while(0)
 #define debug_led_step() do {} while(0)
-#define debug_led_set_pattern( x ) do {} while(0)
+#define debug_led_set_pattern( x, y ) do {} while(0)
 #defin debug_led_pattern 0
 
 #endif

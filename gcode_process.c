@@ -185,14 +185,14 @@ void process_gcode_command() {
  				// wait for all moves to complete
 				queue_wait();
 				// delay
-                                debug_led_set_pattern(52416); // 1100110011000000
+                                debug_led_set_pattern(52416,0); // 1100110011000000
  				for (;next_target.P > 0;next_target.P--) {
 					ifclock(clock_flag_often) {
 						clock_often();
 					}
 					delay_ms(1);
 				}
-                                debug_led_set_pattern(0);
+                                debug_led_set_pattern(0,0);
 				break;
 
 				//	G20 - inches as units
@@ -506,7 +506,7 @@ void process_gcode_command() {
 				if (next_target.S) {
 					power_on();
 					enable_heater();
-                                        debug_led_set_pattern(61680); //1111000011110000
+                                        debug_led_set_pattern(61680,0); //1111000011110000
 				}
 				else {
 					disable_heater();
@@ -585,7 +585,7 @@ void process_gcode_command() {
 
 				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%u\n"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
                                 sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
-                                debug_led_set_pattern(49930);
+                                debug_led_set_pattern(49930,20);
                                 sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
 #ifdef MOTOR_OVER_INTERCOM
 				sersendf_P(PSTR("motor:%su rx.packet.motor:%su step:%su dir:%su\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());

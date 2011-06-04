@@ -232,7 +232,7 @@ void init(void) {
 
         // debug_led pattern=0
         debug_led_init();
-        debug_led_set_pattern(43690); //1010101010101010
+        debug_led_set_pattern(43690,60); //1010101010101010
 
         // set up watchdog
         wd_init();
@@ -282,7 +282,6 @@ int main (void)
 {
 #ifndef DEBUG_MODE
         init();
-        debug_led_set_pattern(0);
         // main loop
         for (;;)
         {

@@ -206,7 +206,7 @@ void check_temp_achieved() {
                         if (temp_achieved()) {
                                 current_movebuffer->live = current_movebuffer->waitfor_temp = 0;
                                 serial_writestr_P(PSTR("Temp achieved\n"));
-                                debug_led_set_pattern(0);
+                                debug_led_set_pattern(0,0);
                         }
 
                         /*#if STEP_INTERRUPT_INTERRUPTIBLE
