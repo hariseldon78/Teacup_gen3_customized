@@ -18,12 +18,15 @@
 #include	"intercom.h"
 #endif
 #include	"memory_barrier.h"
+#include        "debug_led.h"
 
 /*!	do stuff every 1/4 second
  
  	called from clock_10ms(), do not call directly
  */
 void clock_250ms() {
+        debug_led_step();
+
         if (steptimeout > (30 * 4)) {
                 power_off();
         }
@@ -37,8 +40,6 @@ void clock_250ms() {
         }
 
         ifclock(clock_flag_1s) {
-                WRITE(DEBUG_LED, 0);
-
                 if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
                         // current position
                         sersendf_P(PSTR("Pos: %ld,%ld,%ld,%ld,%lu\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
@@ -56,6 +57,7 @@ void clock_250ms() {
                 check_temp_achieved();
 
         }
+        
 
 #ifdef	TEMP_INTERCOM
         start_send();

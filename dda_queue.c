@@ -16,6 +16,7 @@
 #include	"sersendf.h"
 #include	"clock.h"
 #include	"memory_barrier.h"
+#include        "debug_led.h"
 
 /// movebuffer head pointer. Points to the last move in the queue.
 /// this variable is used both in and out of interrupts, but is
@@ -191,8 +192,8 @@ void queue_flush() {
 /// wait for queue to empty
 void queue_wait() {
         for (;queue_empty() == 0;) {
-                ifclock(clock_flag_10ms) {
-                        clock_10ms();
+                ifclock(clock_flag_often) {
+                        clock_often();
                 }
         }
 }
@@ -205,9 +206,8 @@ void check_temp_achieved() {
                         if (temp_achieved()) {
                                 current_movebuffer->live = current_movebuffer->waitfor_temp = 0;
                                 serial_writestr_P(PSTR("Temp achieved\n"));
+                                debug_led_set_pattern(0);
                         }
-                        else
-                                WRITE(DEBUG_LED, 1);
 
                         /*#if STEP_INTERRUPT_INTERRUPTIBLE
                          sei();

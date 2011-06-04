@@ -34,14 +34,18 @@ uint8_t	rxcrc;
 volatile uint8_t	intercom_flags;
 
 #ifdef MOTOR_OVER_INTERCOM
-uint8_t         motor,old_motor;
+uint8_t         motor;
+volatile uint8_t send_motor_flag;
 #define STEP_MASK 1
 #define DIR_MASK 2
 
 void set_motor_step(uint8_t value)
 {
         if (value)
+        {
                 motor |= (uint8_t)STEP_MASK;
+                send_motor_flag=1;
+        }
         else
                 motor &= ~(uint8_t)STEP_MASK;
 //        start_send();
@@ -49,6 +53,7 @@ void set_motor_step(uint8_t value)
 
 void set_motor_dir(uint8_t value)
 {
+        send_motor_flag=1;
         if(value)
                 motor |= (uint8_t)DIR_MASK;
         else
@@ -71,14 +76,6 @@ uint8_t get_motor_value()
         return motor;
 }
 
-void send_motor_if_new()
-{
-        if (old_motor!=motor)
-        {
-                old_motor=motor;
-                start_send();
-        }
-}
 
 #endif
 
@@ -87,7 +84,7 @@ void intercom_init(void)
 {
 #ifdef MOTOR_OVER_INTERCOM
         motor=0;
-        old_motor=0;
+        send_motor_flag=0;
 #endif     
 #ifdef HOST
 	#if INTERCOM_BAUD > 38401

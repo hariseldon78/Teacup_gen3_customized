@@ -23,6 +23,7 @@
 #include	"config.h"
 #include	"home.h"
 #include        "intercom.h"
+#include        "debug_led.h"
 
 /// the current tool
 uint8_t tool;
@@ -181,15 +182,17 @@ void process_gcode_command() {
 				//? In this case sit still doing nothing for 200 milliseconds.  During delays the state of the machine (for example the temperatures of its extruders) will still be preserved and controlled.
 				//?
 
-				// wait for all moves to complete
+ 				// wait for all moves to complete
 				queue_wait();
 				// delay
-				for (;next_target.P > 0;next_target.P--) {
-					ifclock(clock_flag_10ms) {
-						clock_10ms();
+                                debug_led_set_pattern(52416); // 1100110011000000
+ 				for (;next_target.P > 0;next_target.P--) {
+					ifclock(clock_flag_often) {
+						clock_often();
 					}
 					delay_ms(1);
 				}
+                                debug_led_set_pattern(0);
 				break;
 
 				//	G20 - inches as units
@@ -503,6 +506,7 @@ void process_gcode_command() {
 				if (next_target.S) {
 					power_on();
 					enable_heater();
+                                        debug_led_set_pattern(61680); //1111000011110000
 				}
 				else {
 					disable_heater();
@@ -565,7 +569,7 @@ void process_gcode_command() {
 				//?
 				//? <tt>ok C: X:0.00 Y:0.00 Z:0.00 E:0.00</tt>
 				sersendf_P(PSTR("X:%lq,Y:%lq,Z:%lq,E:%lq,F:%ld"), current_position.X * ((int32_t) UM_PER_STEP_X), current_position.Y * ((int32_t) UM_PER_STEP_Y), current_position.Z * ((int32_t) UM_PER_STEP_Z), current_position.E * ((int32_t) UM_PER_STEP_E), current_position.F);
-				// newline is sent from gcode_parse after we return
+ 				// newline is sent from gcode_parse after we return
 				break;
 			// M115- capabilities string
 			case 115:
@@ -580,8 +584,11 @@ void process_gcode_command() {
 				//?  FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:1 TEMP_SENSOR_COUNT:1 HEATER_COUNT:1
 
 				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%u\n"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
+                                sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
+                                debug_led_set_pattern(49930);
+                                sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
 #ifdef MOTOR_OVER_INTERCOM
-				sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
+				sersendf_P(PSTR("motor:%su rx.packet.motor:%su step:%su dir:%su\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
                            /*     {
                                         int i;
                                         for (i=0;i<500;i++)
@@ -598,6 +605,7 @@ void process_gcode_command() {
 
 #endif
                                 temp_print_all_sensors();
+                                sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
 				// newline is sent from gcode_parse after we return
 				break;
 			// M116 - Wait for all temperatures and other slowly-changing variables to arrive at their set values.

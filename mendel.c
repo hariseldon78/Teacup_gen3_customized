@@ -46,7 +46,7 @@
 #include	"arduino.h"
 #include	"clock.h"
 #include	"intercom.h"
-
+#include        "debug_led.h"
 #include        "delay.h"
 
 /// initialise all I/O - set pins as input or output, turn off unused subsystems, etc
@@ -229,6 +229,11 @@ void io_init(void) {
 
 /// Startup code, run when we come out of reset
 void init(void) {
+
+        // debug_led pattern=0
+        debug_led_init();
+        debug_led_set_pattern(43690); //1010101010101010
+
         // set up watchdog
         wd_init();
 
@@ -277,7 +282,7 @@ int main (void)
 {
 #ifndef DEBUG_MODE
         init();
-
+        debug_led_set_pattern(0);
         // main loop
         for (;;)
         {

@@ -74,7 +74,8 @@ void set_motor_dir(uint8_t value);
 uint8_t get_motor_step();
 uint8_t get_motor_dir();
 uint8_t get_motor_value();
-void send_motor_if_new();
+extern volatile uint8_t send_motor_flag;
+#define send_motor_if_new() for (;send_motor_flag;send_motor_flag=0) {start_send();}
 #endif
 
 /// set error code to send to other end
