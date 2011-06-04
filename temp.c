@@ -160,8 +160,7 @@ void temp_sensor_tick() {
                                         }
                                 }
 
-                                // this number depends on how frequently temp_sensor_tick is called. the MAX6675 can give a reading every 0.22s, so set this to about
-                                250ms
+					// this number depends on how frequently temp_sensor_tick is called. the MAX6675 can give a reading every 0.22s, so set this to about 250ms
                                         temp_sensors_runtime[i].next_read_time = 25;
 
                                 break;

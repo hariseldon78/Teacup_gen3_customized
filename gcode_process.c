@@ -579,7 +579,24 @@ void process_gcode_command() {
 				//? sample data from firmware:
 				//?  FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:1 TEMP_SENSOR_COUNT:1 HEATER_COUNT:1
 
-				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%d\n"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
+				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%u\n"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
+#ifdef MOTOR_OVER_INTERCOM
+				sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
+                                {
+                                        int i;
+                                        for (i=0;i<500;i++)
+                                        {
+                                                e_step();
+                                                delay(5000);
+			        //	sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
+                                        _e_step(0);
+                                                delay(50000);
+                                //        sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
+                                        }
+                                }
+				sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
+
+#endif
                                 temp_print_all_sensors();
 				// newline is sent from gcode_parse after we return
 				break;

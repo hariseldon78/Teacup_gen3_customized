@@ -10,6 +10,10 @@
 #include	"config.h"
 #include	"delay.h"
 
+#ifdef HOST 
+#include "serial.h" 
+#endif
+
 #if	 (defined TEMP_INTERCOM) || (defined EXTRUDER)
 #define		INTERCOM_BAUD			57600
 
@@ -29,8 +33,51 @@ uint8_t	rxcrc;
 
 volatile uint8_t	intercom_flags;
 
+#ifdef MOTOR_OVER_INTERCOM
+uint8_t         motor;
+#define STEP_MASK 1
+#define DIR_MASK 2
+
+void set_motor_step(uint8_t value)
+{
+        if (value)
+                motor |= (uint8_t)STEP_MASK;
+        else
+                motor &= ~(uint8_t)STEP_MASK;
+        start_send();
+}
+
+void set_motor_dir(uint8_t value)
+{
+        if(value)
+                motor |= (uint8_t)DIR_MASK;
+        else
+                motor &= ~(uint8_t)DIR_MASK;
+        start_send();
+} 
+
+uint8_t get_motor_step()
+{
+        return (motor & STEP_MASK) >> (STEP_MASK-1);
+}
+
+uint8_t get_motor_dir()
+{
+        return (motor & DIR_MASK) >> (DIR_MASK -1);
+}
+
+uint8_t get_motor_value()
+{
+        return motor;
+}
+#endif
+
+
 void intercom_init(void)
 {
+#ifdef MOTOR_OVER_INTERCOM
+        motor=0;
+#endif     
 #ifdef HOST
 	#if INTERCOM_BAUD > 38401
 		UCSR1A = MASK(U2X1);
@@ -90,6 +137,11 @@ uint8_t get_err() {
 }
 
 void start_send(void) {
+        start_send_custom(105);
+}
+        
+void start_send_custom(uint8_t word_to_send)
+{
 	uint8_t txcrc = 0, i;
 
 	// atomically update flags
@@ -98,16 +150,23 @@ void start_send(void) {
 	intercom_flags = (intercom_flags & ~FLAG_TX_FINISHED) | FLAG_TX_IN_PROGRESS;
 	SREG = sreg;
 
+
+//        serial_writechar('>');
+
+
 	// enable transmit pin
 	enable_transmit();
 
 	// set start byte
 	tx.packet.start = START;
-        tx.packet.debug = 222;
+
 	// set packet type
-	tx.packet.control_word = 105;
+	tx.packet.control_word =  word_to_send;
 	tx.packet.control_index = 0;
 
+#ifdef MOTOR_OVER_INTERCOM
+        tx.packet.motor=motor;
+#endif
 	// calculate CRC for outgoing packet
 	for (i = 0; i < (sizeof(intercom_packet_t) - 1); i++) {
 		txcrc ^= tx.data[i];
@@ -126,7 +185,6 @@ void start_send(void) {
 	#else
 		UCSR0B |= MASK(UDRIE0);
 	#endif
-
 }
 
 /*
@@ -164,12 +222,12 @@ ISR(USART_RX_vect)
 			rxcrc ^= c;
 		// stuff byte into structure
 		_rx.data[packet_pointer++] = c;
-		// last byte?
+
+                // last byte?
 		if (packet_pointer >= sizeof(intercom_packet_t)) {
+
 			// reset pointer
 			packet_pointer = 0;
-
-
 
 			#ifndef HOST
 			if (rxcrc == _rx.packet.crc &&
@@ -177,19 +235,22 @@ ISR(USART_RX_vect)
 			#else
 			if (rxcrc == _rx.packet.crc){
 			#endif
-			// correct crc copy packet
+				// correct crc copy packet
 				static uint8_t i;
 				for (i = 0; i < (sizeof(intercom_packet_t) ); i++) {
 					rx.data[i] = _rx.data[i];
 				}
 			}
-
 			#ifndef HOST
 				if (rx.packet.controller_num == THIS_CONTROLLER_NUM) {
 					if (rxcrc != _rx.packet.crc)
 						tx.packet.err = ERROR_BAD_CRC;
-					else
+					else {
 						intercom_flags = (intercom_flags & ~FLAG_RX_IN_PROGRESS) | FLAG_NEW_RX;
+                                        #ifdef MOTOR_OVER_INTERCOM
+                                                motor=rx.packet.motor;
+                                        #endif
+                                        }
 					// not sure why exactly this delay is needed, but wihtout it first byte never arrives.
 // 					delay_us(150);
 // 					start_send();

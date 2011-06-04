@@ -33,6 +33,9 @@ typedef struct {
 		uint16_t	temp[2];
 	};
         uint8_t         debug;
+#ifdef MOTOR_OVER_INTERCOM
+        uint8_t         motor;
+#endif
 	uint8_t		err;	///< error code, if any
 	uint8_t		crc;	///< crc for packet verification. packets with bad crc are simply ignored
 } intercom_packet_t;
@@ -64,6 +67,15 @@ void set_dio(uint8_t index, uint8_t value);
 /// if host, read extruder DIO inputs
 /// if extruder, set DIO outputs
 uint8_t	get_dio(uint8_t index);
+
+#ifdef MOTOR_OVER_INTERCOM
+void set_motor_step(uint8_t value);
+void set_motor_dir(uint8_t value);
+uint8_t get_motor_step();
+uint8_t get_motor_dir();
+uint8_t get_motor_value();
+#endif
+
 
 /// set error code to send to other end
 void set_err(uint8_t err);

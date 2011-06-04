@@ -32,12 +32,15 @@ void io_init(void) {
         SET_INPUT(TRIM_POT);
         SET_INPUT(TEMP_PIN);
         SET_INPUT(TEMP_BED_PIN);
+
+#if defined E_STEP_PIN && defined E_DIR_PIN
         SET_INPUT(E_STEP_PIN);
         SET_INPUT(E_DIR_PIN);
 
         // use pull up resistors to avoid noise
         WRITE(E_STEP_PIN, 1);
         WRITE(E_DIR_PIN, 1);
+#endif
 
         //Enable the RS485 transceiver
         SET_OUTPUT(RX_ENABLE_PIN);
@@ -81,23 +84,38 @@ void io_init(void) {
 void motor_init(void) {
         //Enable an interrupt to be triggered when the step pin changes
         //This will be PCIE0
-//#ifndef MOTOR_OVER_INTERCOM
+#ifndef MOTOR_OVER_INTERCOM
         PCICR = MASK(PCIE0);
         PCMSK0 = MASK(PCINT2);
-//#endif
+#endif
 }
 
+#ifdef MOTOR_OVER_INTERCOM
+
+uint8_t old_motor;
+
+void motor_move() {
+#else
 ISR(PCINT0_vect) {
+#endif
         static uint8_t coil_pos, pwm;
 
         //if the step pin is high, we advance the motor
+#ifdef MOTOR_OVER_INTERCOM
+        if (get_motor_step()) {
+#else
         if (READ(E_STEP_PIN)) {
+#endif
 
                 //Turn on motors only on first tick to save power I guess
                 enable_motors();
 
                 //Advance the coil position
-                if (READ(E_DIR_PIN)) 
+#ifdef MOTOR_OVER_INTERCOM
+                if (get_motor_dir())
+#else
+                if (READ(E_DIR_PIN))
+#endif 
                         coil_pos++;
                 else
                         coil_pos--;
@@ -214,7 +232,7 @@ int main (void)
                 {
                         a=0;
                         //                        WRITE(DEBUG_LED,++deb%2);
-               //         WRITE(DEBUG_LED,0);
+                        WRITE(DEBUG_LED,0);
                 }       
 
                 wd_reset();
@@ -230,6 +248,16 @@ int main (void)
                 // check if we've had a new intercom packet
                 if (intercom_flags & FLAG_NEW_RX) {
                         intercom_flags &= ~FLAG_NEW_RX;
+                        
+#ifdef MOTOR_OVER_INTERCOM
+
+                        if (get_motor_step())
+                        {
+                                motor_move();
+                                set_motor_step(0);
+                       }
+#endif
+
 
                         switch (rx.packet.control_word) {
                                 // M105- read temperatures
@@ -392,6 +420,7 @@ int main (void)
 #endif
 #endif
 }
+
 
 
 

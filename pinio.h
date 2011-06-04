@@ -149,7 +149,16 @@ Extruder
 	#else
 		#define	e_direction(dir)	WRITE(E_DIR_PIN, dir^1)
 	#endif
+#elif defined MOTOR_OVER_INTERCOM
+	#define	_e_step(st)					do { } while (0) // we do the unstep on the extruder side
+        #define	e_step()						set_motor_step(1);
+	#ifndef	E_INVERT_DIR
+		#define	e_direction(dir)	do { set_motor_dir(dir); } while (0)
+	#else
+		#define	e_direction(dir)	do { set_motor_dir(dir^1); } while (0)
+	#endif
 #else
+
 	#define	_e_step(st)					do { } while (0)
 	#define	e_step()						do { } while (0)
 	#define	e_direction(dir)		do { } while (0)

@@ -33,8 +33,62 @@ uint8_t	rxcrc;
 
 volatile uint8_t	intercom_flags;
 
+#ifdef MOTOR_OVER_INTERCOM
+uint8_t         motor,old_motor;
+#define STEP_MASK 1
+#define DIR_MASK 2
+
+void set_motor_step(uint8_t value)
+{
+        if (value)
+                motor |= (uint8_t)STEP_MASK;
+        else
+                motor &= ~(uint8_t)STEP_MASK;
+//        start_send();
+}
+
+void set_motor_dir(uint8_t value)
+{
+        if(value)
+                motor |= (uint8_t)DIR_MASK;
+        else
+                motor &= ~(uint8_t)DIR_MASK;
+//        start_send();
+} 
+
+uint8_t get_motor_step()
+{
+        return (motor & STEP_MASK) >> (STEP_MASK-1);
+}
+
+uint8_t get_motor_dir()
+{
+        return (motor & DIR_MASK) >> (DIR_MASK -1);
+}
+
+uint8_t get_motor_value()
+{
+        return motor;
+}
+
+void send_motor_if_new()
+{
+        if (old_motor!=motor)
+        {
+                old_motor=motor;
+                start_send();
+        }
+}
+
+#endif
+
+
 void intercom_init(void)
 {
+#ifdef MOTOR_OVER_INTERCOM
+        motor=0;
+        old_motor=0;
+#endif     
 #ifdef HOST
 	#if INTERCOM_BAUD > 38401
 		UCSR1A = MASK(U2X1);
@@ -121,6 +175,10 @@ void start_send_custom(uint8_t word_to_send)
 	tx.packet.control_word =  word_to_send;
 	tx.packet.control_index = 0;
 
+#ifdef MOTOR_OVER_INTERCOM
+        tx.packet.motor=motor;
+        set_motor_step(0);
+#endif
 	// calculate CRC for outgoing packet
 	for (i = 0; i < (sizeof(intercom_packet_t) - 1); i++) {
 		txcrc ^= tx.data[i];
@@ -189,21 +247,22 @@ ISR(USART_RX_vect)
 			#else
 			if (rxcrc == _rx.packet.crc){
 			#endif
-                                WRITE(DEBUG_LED, 1);
-                
 				// correct crc copy packet
 				static uint8_t i;
 				for (i = 0; i < (sizeof(intercom_packet_t) ); i++) {
 					rx.data[i] = _rx.data[i];
 				}
 			}
-
 			#ifndef HOST
 				if (rx.packet.controller_num == THIS_CONTROLLER_NUM) {
 					if (rxcrc != _rx.packet.crc)
 						tx.packet.err = ERROR_BAD_CRC;
-					else
+					else {
 						intercom_flags = (intercom_flags & ~FLAG_RX_IN_PROGRESS) | FLAG_NEW_RX;
+                                        #ifdef MOTOR_OVER_INTERCOM
+                                                motor=rx.packet.motor;
+                                        #endif
+                                        }
 					// not sure why exactly this delay is needed, but wihtout it first byte never arrives.
 // 					delay_us(150);
 // 					start_send();
@@ -211,7 +270,7 @@ ISR(USART_RX_vect)
 			#else
 				intercom_flags = (intercom_flags & ~FLAG_RX_IN_PROGRESS) | FLAG_NEW_RX;
 			#endif
-		}
+ 		}
 	}
 }
 

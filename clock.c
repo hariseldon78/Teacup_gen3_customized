@@ -75,6 +75,10 @@ void clock_10ms() {
 	}
 
 	update_position();
+        
+        #ifdef MOTOR_OVER_INTERCOM
+        send_motor_if_new();
+        #endif
 }
 
 
