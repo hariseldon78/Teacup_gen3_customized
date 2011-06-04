@@ -15,7 +15,7 @@
 #endif
 
 #if	 (defined TEMP_INTERCOM) || (defined EXTRUDER)
-#define		INTERCOM_BAUD			57600
+#define		INTERCOM_BAUD			115200
 
 #define	START	0x55
 

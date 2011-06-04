@@ -47,5 +47,8 @@ void queue_flush(void);
 // wait for queue to empty
 void queue_wait(void);
 
+// unlock queue is temperature is achieved
+void check_temp_achieved();
+
 #endif	/* _DDA_QUEUE */
 

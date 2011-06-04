@@ -1,8 +1,8 @@
 #include	"clock.h"
 
 /** \file
-	\brief Do stuff periodically
-*/
+ * 	\brief Do stuff periodically
+ */
 
 #include	"pinio.h"
 #include	"sersendf.h"
@@ -13,80 +13,85 @@
 #include	"debug.h"
 #include	"heater.h"
 #include	"serial.h"
+#include        "dda_queue.h"
 #ifdef	TEMP_INTERCOM
-	#include	"intercom.h"
+#include	"intercom.h"
 #endif
 #include	"memory_barrier.h"
 
 /*!	do stuff every 1/4 second
-
-	called from clock_10ms(), do not call directly
-*/
+ 
+ 	called from clock_10ms(), do not call directly
+ */
 void clock_250ms() {
-	if (steptimeout > (30 * 4)) {
-		power_off();
-	}
-	else if (heaters_all_off())	{
-		uint8_t save_reg = SREG;
-		cli();
-		CLI_SEI_BUG_MEMORY_BARRIER();
-		steptimeout++;
-		MEMORY_BARRIER();
-		SREG = save_reg;
-	}
+        if (steptimeout > (30 * 4)) {
+                power_off();
+        }
+        else if (heaters_all_off())	{
+                uint8_t save_reg = SREG;
+                cli();
+                CLI_SEI_BUG_MEMORY_BARRIER();
+                steptimeout++;
+                MEMORY_BARRIER();
+                SREG = save_reg;
+        }
 
-	ifclock(clock_flag_1s) {
+        ifclock(clock_flag_1s) {
                 WRITE(DEBUG_LED, 0);
+
+                if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
+                        // current position
+                        sersendf_P(PSTR("Pos: %ld,%ld,%ld,%ld,%lu\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
+
+                        // target position
+                        sersendf_P(PSTR("Dst: %ld,%ld,%ld,%ld,%lu\n"), movebuffer[mb_tail].endpoint.X, movebuffer[mb_tail].endpoint.Y, movebuffer[mb_tail].endpoint.Z, movebuffer[mb_tail].endpoint.E, movebuffer[mb_tail].endpoint.F);
+
+                        // Queue
+                        print_queue();
+
+                        // newline
+                        serial_writechar('\n');
+                }
                 
- 		if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
-			// current position
-			sersendf_P(PSTR("Pos: %ld,%ld,%ld,%ld,%lu\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
+                check_temp_achieved();
 
-			// target position
-			sersendf_P(PSTR("Dst: %ld,%ld,%ld,%ld,%lu\n"), movebuffer[mb_tail].endpoint.X, movebuffer[mb_tail].endpoint.Y, movebuffer[mb_tail].endpoint.Z, movebuffer[mb_tail].endpoint.E, movebuffer[mb_tail].endpoint.F);
+        }
 
-			// Queue
-			print_queue();
+#ifdef	TEMP_INTERCOM
+        start_send();
+#endif
 
-			// newline
-			serial_writechar('\n');
-		}
-		// temperature
-		/*		if (temp_get_target())
-		temp_print();*/
-	}
-	#ifdef	TEMP_INTERCOM
-	start_send();
-	#endif
+
 }
 
 /*! do stuff every 10 milliseconds
-
-	call from ifclock(CLOCK_FLAG_10MS) in busy loops
-*/
+ 
+ 	call from ifclock(CLOCK_FLAG_10MS) in busy loops
+ */
 void clock_10ms() {
-	// reset watchdog
-	wd_reset();
+        // reset watchdog
+        wd_reset();
 
-	temp_tick();
+        temp_tick();
 
-	ifclock(clock_flag_250ms) {
-		clock_250ms();
-	}
+        ifclock(clock_flag_250ms) {
+                clock_250ms();
+        }
 
-	update_position();
-        
-        
+        update_position();
+
+
 }
 
 void clock_often() {
-        #ifdef MOTOR_OVER_INTERCOM
+#ifdef MOTOR_OVER_INTERCOM
         send_motor_if_new();
-        #endif
+#endif
         ifclock(clock_flag_10ms) {
                 clock_10ms();
         }
-       
+
 }
+
 
 
