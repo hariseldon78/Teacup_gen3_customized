@@ -14,6 +14,7 @@ clock stuff
 extern volatile uint8_t	clock_flag_10ms;
 extern volatile uint8_t	clock_flag_250ms;
 extern volatile uint8_t	clock_flag_1s;
+extern volatile uint8_t clock_flag_often;
 
 extern volatile uint8_t	timer1_compa_deferred_enable;
 

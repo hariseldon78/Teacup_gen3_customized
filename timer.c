@@ -36,10 +36,13 @@ uint8_t						clock_counter_250ms = 0;
 /// keep track of when 1s has elapsed
 uint8_t						clock_counter_1s = 0;
 
+
 /// flags to tell main loop when above have elapsed
 volatile uint8_t	clock_flag_10ms = 0;
 volatile uint8_t	clock_flag_250ms = 0;
 volatile uint8_t	clock_flag_1s = 0;
+/// the minimum time we can track
+volatile uint8_t	clock_flag_often = 0;
 
 volatile uint8_t	timer1_compa_deferred_enable = 0;
 
@@ -51,6 +54,8 @@ ISR(TIMER1_COMPB_vect) {
 	/*
 	clock stuff
 	*/
+        clock_flag_often=1;
+        
 	clock_counter_10ms += TICK_TIME_MS;
 	if (clock_counter_10ms >= 10) {
 		clock_counter_10ms -= 10;

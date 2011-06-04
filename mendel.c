@@ -286,9 +286,8 @@ int main (void)
                         uint8_t c = serial_popchar();
                         gcode_parse_char(c);
                 }
-
-                ifclock(clock_flag_10ms) {
-                        clock_10ms();
+                ifclock(clock_flag_often) {
+                        clock_often();
                 }
         }
 #else

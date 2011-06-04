@@ -76,9 +76,17 @@ void clock_10ms() {
 
 	update_position();
         
+        
+}
+
+void clock_often() {
         #ifdef MOTOR_OVER_INTERCOM
         send_motor_if_new();
         #endif
+        ifclock(clock_flag_10ms) {
+                clock_10ms();
+        }
+       
 }
 
 
