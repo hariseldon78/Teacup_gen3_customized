@@ -85,6 +85,25 @@ static void SpecialMoveE(int32_t e, uint32_t f) {
 void process_gcode_command() {
 	uint32_t	backup_f;
 
+        #if defined REST_TIME
+        if (working_seconds>REST_TIME) {
+                working_seconds=0;
+                queue_wait();
+		// delay
+                debug_led_set_pattern(52416,0); // 1100110011000000
+                uint16_t i=60000;
+ 		for (;i > 0;i--) {
+		        ifclock(clock_flag_often) {
+			        clock_often();
+			}
+			delay_ms(1);
+		}
+                debug_led_set_pattern(0,0);
+                working_seconds=0;
+        }
+        #endif //REST_TIME
+
+
 	// convert relative to absolute
 	if (next_target.option_relative) {
 		next_target.target.X += startpoint.X;
@@ -584,28 +603,11 @@ void process_gcode_command() {
 				//?  FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:1 TEMP_SENSOR_COUNT:1 HEATER_COUNT:1
 
 				sersendf_P(PSTR("FIRMWARE_NAME:Teacup FIRMWARE_URL:http%%3A//github.com/triffid/Teacup_Firmware/ PROTOCOL_VERSION:1.0 MACHINE_TYPE:Mendel EXTRUDER_COUNT:%d TEMP_SENSOR_COUNT:%d HEATER_COUNT:%d debug-value:%u\n"), 1, NUM_TEMP_SENSORS, NUM_HEATERS,rx.packet.debug);
-                                sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
-                                debug_led_set_pattern(49930,20);
-                                sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
+                                sersendf_P(PSTR("debug_led_pattern:%u time_from_boot: %lu:%lu\n"),debug_led_pattern,seconds_from_boot()/60,seconds_from_boot()%60);
 #ifdef MOTOR_OVER_INTERCOM
 				sersendf_P(PSTR("motor:%su rx.packet.motor:%su step:%su dir:%su\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
-                           /*     {
-                                        int i;
-                                        for (i=0;i<500;i++)
-                                        {
-                                                e_step();
-                                                delay(5000);
-			        //	sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
-                                        _e_step(0);
-                                                delay(50000);
-                                //        sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
-                                        }
-                                }
-				sersendf_P(PSTR("motor:%u rx.packet.motor:%u step:%u dir:%u\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());*/
-
 #endif
                                 temp_print_all_sensors();
-                                sersendf_P(PSTR("debug_led_pattern:%u"),debug_led_pattern);
 				// newline is sent from gcode_parse after we return
 				break;
 			// M116 - Wait for all temperatures and other slowly-changing variables to arrive at their set values.

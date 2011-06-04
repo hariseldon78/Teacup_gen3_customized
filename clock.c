@@ -24,6 +24,17 @@
  
  	called from clock_10ms(), do not call directly
  */
+ 
+uint32_t seconds_counter=0;
+#ifdef REST_TIME
+uint32_t working_seconds=0;
+#endif
+
+uint32_t seconds_from_boot()
+{
+        return seconds_counter;
+}
+
 void clock_250ms() {
         debug_led_step();
 
@@ -40,6 +51,8 @@ void clock_250ms() {
         }
 
         ifclock(clock_flag_1s) {
+                seconds_counter++;
+                
                 if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
                         // current position
                         sersendf_P(PSTR("Pos: %ld,%ld,%ld,%ld,%lu\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
@@ -55,6 +68,15 @@ void clock_250ms() {
                 }
                 
                 check_temp_achieved();
+                
+                #ifdef ALWAYS_ON
+                power_on();
+                #endif
+                
+                #if defined REST_TIME
+                // todo: increase only when effectively working...
+                ++working_seconds;
+                #endif
 
         }
         
