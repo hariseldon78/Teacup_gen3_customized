@@ -87,14 +87,15 @@ void process_gcode_command() {
 
         #if defined REST_TIME
         if (working_seconds>REST_TIME) {
+                sersendf_P(PSTR("RESTING TIME"));
                 working_seconds=0;
                 queue_wait();
 		// delay
                 debug_led_set_pattern(52416,0); // 1100110011000000
                 uint16_t i=60000;
  		for (;i > 0;i--) {
-		        ifclock(clock_flag_often) {
-			        clock_often();
+		        ifclock(clock_flag_10ms) {
+			        clock_10ms();
 			}
 			delay_ms(1);
 		}
@@ -206,8 +207,8 @@ void process_gcode_command() {
 				// delay
                                 debug_led_set_pattern(52416,0); // 1100110011000000
  				for (;next_target.P > 0;next_target.P--) {
-					ifclock(clock_flag_often) {
-						clock_often();
+					ifclock(clock_flag_10ms) {
+						clock_10ms();
 					}
 					delay_ms(1);
 				}

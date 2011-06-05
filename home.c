@@ -43,10 +43,6 @@ void home_x_negative() {
         // home X
         x_enable();
         // hit home hard
-#ifdef DEBUG  
-        sersendf_P(PSTR("MAXIMUM_FEEDRATE_X=%lu, SEARCH_FEEDRATE_X=%lu\n"),(uint32_t)MAXIMUM_FEEDRATE_X,(uint32_t)SEARCH_FEEDRATE_X);
-        sersendf_P(PSTR("1; x_min=%u\n"),(uint8_t)x_min());
-#endif
         x_direction(0);
         while (denoise_count < 8) {
                 // denoise
@@ -59,17 +55,11 @@ void home_x_negative() {
                 delay(5);
                 unstep();
                 // wait until next step time
-                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_X / ((float) MAXIMUM_FEEDRATE_X)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
+                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_X / ((float) SEARCH_FEEDRATE_X)));
         }
         denoise_count = 0;
 
         // back off slowly
-#ifdef DEBUG  
-        sersendf_P(PSTR("2; x_min=%u\n"),(uint8_t)x_min());
-#endif
         x_direction(1);
         while (x_min() != 0) {
                 // step
@@ -78,13 +68,8 @@ void home_x_negative() {
                 unstep();
                 // wait until next step time
                 delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_X / ((float) SEARCH_FEEDRATE_X)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
         }
-#ifdef DEBUG  
-        sersendf_P(PSTR("3; x_min=%u\n"),(uint8_t)x_min());
-#endif
+
         // set X home
         startpoint.X = current_position.X = 0;
 #endif
@@ -112,13 +97,10 @@ void home_x_positive() {
                 delay(5);
                 unstep();
                 // wait until next step time
-                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_X / ((float) MAXIMUM_FEEDRATE_X)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
+                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_X / ((float) SEARCH_FEEDRATE_X)));
         }
         denoise_count = 0;
-
+ 
         // back off slowly
         x_direction(0);
         while (x_max() != 0) {
@@ -128,9 +110,6 @@ void home_x_positive() {
                 unstep();
                 // wait until next step time
                 delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_X / ((float) SEARCH_FEEDRATE_X)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
         }
 
         // set X home
@@ -166,13 +145,11 @@ void home_y_negative() {
                 delay(5);
                 unstep();
                 // wait until neyt step time
-                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Y / ((float) MAXIMUM_FEEDRATE_Y)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
+                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Y / ((float) SEARCH_FEEDRATE_Y)));
         }
         denoise_count = 0;
 
+ 
         // back off slowly
         y_direction(1);
         while (y_min() != 0) {
@@ -182,9 +159,6 @@ void home_y_negative() {
                 unstep();
                 // wait until next step time
                 delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Y / ((float) SEARCH_FEEDRATE_Y)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
         }
 
         // set Y home
@@ -214,13 +188,10 @@ void home_y_positive() {
                 delay(5);
                 unstep();
                 // wait until neyt step time
-                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Y / ((float) MAXIMUM_FEEDRATE_Y)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
+                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Y / ((float) SEARCH_FEEDRATE_Y)));
         }
         denoise_count = 0;
-
+ 
         // back off slowly
         y_direction(0);
         while (y_max() != 0) {
@@ -230,9 +201,6 @@ void home_y_positive() {
                 unstep();
                 // wait until next step time
                 delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Y / ((float) SEARCH_FEEDRATE_Y)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
         }
 
         // set Y home
@@ -255,23 +223,6 @@ void home_z_negative() {
 
         // home Z
         z_enable();
-#ifdef DEBUG  
-        sersendf_P(PSTR("MAXIMUM_FEEDRATE_Z=%lu, SEARCH_FEEDRATE_Z=%lu\n"),(uint32_t)MAXIMUM_FEEDRATE_Z,(uint32_t)SEARCH_FEEDRATE_Z);
- 
-  /*      z_direction(1);
-        uint16_t i=0;
-        for (i=0;i<5000;i++) {
-                
-                
-                z_step();
-                delay(5);
-                unstep();
-                // wait until next step time
-                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Z / ((float) MAXIMUM_FEEDRATE_Z)));
-        }*/
-        
-       sersendf_P(PSTR("hit home hard; z_min=%u\n"),(uint8_t)z_min());
-#endif
 
         // hit home hard
         z_direction(0);
@@ -286,15 +237,10 @@ void home_z_negative() {
                 delay(4);
                 unstep();
                 // wait until next step time
-                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Z / ((float) MAXIMUM_FEEDRATE_Z)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
+                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Z / ((float) SEARCH_FEEDRATE_Z)));
         }
         denoise_count = 0;
-#ifdef DEBUG
-        sersendf_P(PSTR("back off slowly; z_min=%u\n"),(uint8_t)z_min());
-#endif
+ 
         // back off slowly
         z_direction(1);
         while (z_min() != 0) {
@@ -304,14 +250,8 @@ void home_z_negative() {
                 unstep();
                 // wait until next step time
                 delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Z / ((float) SEARCH_FEEDRATE_Z)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
         }
 
-#ifdef DEBUG  
-        sersendf_P(PSTR("home; z_min=%u\n"),(uint8_t)z_min());
-#endif
         // set Z home
         startpoint.Z = current_position.Z = 0;
         z_disable();
@@ -327,9 +267,6 @@ void home_z_positive() {
 
         // home Z
         z_enable();
-#ifdef DEBUG  
-        sersendf_P(PSTR("1; z_max=%u\n"),(uint8_t)z_max());
-#endif
 
         // hit home hard
         z_direction(1);
@@ -343,18 +280,13 @@ void home_z_positive() {
                 z_step();
                 delay(4);
                 unstep();
-                // wait until next step time
-                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Z / ((float) MAXIMUM_FEEDRATE_Z)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
+                // wait until next step time 
+                delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Z / ((float) SEARCH_FEEDRATE_Z)));
         }
 
         denoise_count = 0;
+ 
 
-#ifdef DEBUG  
-        sersendf_P(PSTR("2; z_max=%u\n"),(uint8_t)z_max());
-#endif
         // back off slowly
         z_direction(0);
         while (z_max() != 0) {
@@ -364,14 +296,8 @@ void home_z_positive() {
                 unstep();
                 // wait until next step time
                 delay((uint32_t) (60.0 * 1000000.0 / STEPS_PER_MM_Z / ((float) SEARCH_FEEDRATE_Z)));
-                ifclock(clock_flag_often) {
-                        clock_often();
-                }                
         }
 
-#ifdef DEBUG  
-        sersendf_P(PSTR("3; z_max=%u\n"),(uint8_t)z_max());
-#endif
         // set Z home
         TARGET t = {
                 0, 0, 0, 0, 0        };

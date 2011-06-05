@@ -1,7 +1,7 @@
 #include	"analog.h"
 
 /** \file
-	\brief Analog subsystem
+	\brief Analog sub system
 */
 
 #include "temp.h"

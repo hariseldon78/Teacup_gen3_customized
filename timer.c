@@ -22,7 +22,7 @@
 #include	"memory_barrier.h"
 
 /// how often we overflow and update our clock; with F_CPU=16MHz, max is < 4.096ms (TICK_TIME = 65535)
-#define		TICK_TIME			3 MS
+#define		TICK_TIME			2 MS
 /// convert back to ms from cpu ticks so our system clock runs properly if you change TICK_TIME
 #define		TICK_TIME_MS	(TICK_TIME / (F_CPU / 1000))
 
@@ -41,8 +41,6 @@ uint8_t						clock_counter_1s = 0;
 volatile uint8_t	clock_flag_10ms = 0;
 volatile uint8_t	clock_flag_250ms = 0;
 volatile uint8_t	clock_flag_1s = 0;
-/// the minimum time we can track
-volatile uint8_t	clock_flag_often = 0;
 
 volatile uint8_t	timer1_compa_deferred_enable = 0;
 
@@ -54,8 +52,6 @@ ISR(TIMER1_COMPB_vect) {
 	/*
 	clock stuff
 	*/
-        clock_flag_often=1;
-        
 	clock_counter_10ms += TICK_TIME_MS;
 	if (clock_counter_10ms >= 10) {
 		clock_counter_10ms -= 10;

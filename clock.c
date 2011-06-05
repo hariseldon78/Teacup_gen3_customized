@@ -51,8 +51,8 @@ void clock_250ms() {
         }
 
         ifclock(clock_flag_1s) {
-                seconds_counter++;
-                
+		#ifdef DEBUG		
+		sersendf_P(PSTR("1s"));
                 if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
                         // current position
                         sersendf_P(PSTR("Pos: %ld,%ld,%ld,%ld,%lu\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
@@ -66,18 +66,29 @@ void clock_250ms() {
                         // newline
                         serial_writechar('\n');
                 }
-                
+                #endif
+
                 check_temp_achieved();
+		#ifdef DEBUG		
+		sersendf_P(PSTR("t"));
+                #endif
                 
                 #ifdef ALWAYS_ON
                 power_on();
                 #endif
+		#ifdef DEBUG		
+		sersendf_P(PSTR("p"));
+                #endif
+                
+                ++seconds_counter;
                 
                 #if defined REST_TIME
-                // todo: increase only when effectively working...
+                // todo: increase only when effectively working... 
                 ++working_seconds;
                 #endif
-
+		#ifdef DEBUG		
+		sersendf_P(PSTR("r\n"));
+                #endif
         }
         
 
@@ -98,24 +109,17 @@ void clock_10ms() {
 
         temp_tick();
 
+#ifdef MOTOR_OVER_INTERCOM
+        send_motor_if_new();
+#endif
         ifclock(clock_flag_250ms) {
                 clock_250ms();
         }
 
         update_position();
 
-
 }
 
-void clock_often() {
-#ifdef MOTOR_OVER_INTERCOM
-        send_motor_if_new();
-#endif
-        ifclock(clock_flag_10ms) {
-                clock_10ms();
-        }
-
-}
 
 
 
