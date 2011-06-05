@@ -592,7 +592,7 @@ void process_gcode_command() {
 				//? <tt>ok C: X:0.00 Y:0.00 Z:0.00 E:0.00</tt>
 				sersendf_P(PSTR("X:%lq,Y:%lq,Z:%lq,E:%lq,F:%ld"), current_position.X * ((int32_t) UM_PER_STEP_X), current_position.Y * ((int32_t) UM_PER_STEP_Y), current_position.Z * ((int32_t) UM_PER_STEP_Z), current_position.E * ((int32_t) UM_PER_STEP_E), current_position.F);
  				// newline is sent from gcode_parse after we return
-				break;
+				break;//? ==== M114: Get Current Position ====
 			// M115- capabilities string
 			case 115:
 				//? ==== M115: Get Firmware Version and Capabilities ====
@@ -611,7 +611,9 @@ void process_gcode_command() {
 				sersendf_P(PSTR("motor:%su rx.packet.motor:%su step:%su dir:%su\n"),get_motor_value(),rx.packet.motor,get_motor_step(),get_motor_dir());
 #endif
                                 temp_print_all_sensors();
-				// newline is sent from gcode_parse after we return
+				sersendf_P(PSTR("X:%ld,Y:%ld,Z:%ld,E:%ld,F:%ld\n"), ((int32_t)current_position.X), ((int32_t)current_position.Y) , ((int32_t)current_position.Z) , ((int32_t)current_position.E) , current_position.F);
+				sersendf_P(PSTR("UMX:%ld,UMY:%ld,UMZ:%ld,UME:%ld\n"), ((int32_t) UM_PER_STEP_X),((int32_t) UM_PER_STEP_Y),  ((int32_t) UM_PER_STEP_Z), ((int32_t) UM_PER_STEP_E));
+ 				// newline is sent from gcode_parse after we return
 				break;
 			// M116 - Wait for all temperatures and other slowly-changing variables to arrive at their set values.
 			case 116:
