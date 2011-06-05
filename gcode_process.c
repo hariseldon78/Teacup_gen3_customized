@@ -87,7 +87,9 @@ void process_gcode_command() {
 
         #if defined REST_TIME
         if (working_seconds>REST_TIME) {
-                sersendf_P(PSTR("RESTING TIME"));
+		#ifdef DEBUG                
+		sersendf_P(PSTR("RESTING TIME"));
+		#endif
                 working_seconds=0;
                 queue_wait();
 		// delay

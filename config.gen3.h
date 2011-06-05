@@ -54,12 +54,12 @@
 	for belts, this is (steps per motor turn) / (number of gear teeth) / (belt module)
 	half-stepping doubles the number, quarter stepping requires * 4, etc.
 */
-#define	STEPS_PER_MM_X				320.000
-#define	STEPS_PER_MM_Y				320.000
-#define	STEPS_PER_MM_Z				200.000
+#define	STEPS_PER_MM_X				10.047
+#define	STEPS_PER_MM_Y				10.047
+#define	STEPS_PER_MM_Z				833.398
 
 /// http://blog.arcol.hu/?p=157 may help with this one
-#define	STEPS_PER_MM_E				320.000
+#define	STEPS_PER_MM_E				44
 
 
 /*
@@ -91,13 +91,13 @@
 */
 
 #define	X_MIN			0.0
-#define	X_MAX			200.0
+#define	X_MAX			173.0
 
 #define	Y_MIN			0.0
-#define	Y_MAX			200.0
+#define	Y_MAX			144.0
 
 #define	Z_MIN			0.0
-#define	Z_MAX			140.0
+#define	Z_MAX			80.0
 
 /**	\def E_ABSOLUTE
 	Some G-Code creators produce relative length commands for the extruder, others absolute ones. G-Code using absolute lengths can be recognized when there are G92 E0 commands from time to time. If you have G92 E0 in your G-Code, define this flag.
@@ -205,10 +205,11 @@
 //#define	Z_INVERT_MAX
 //#define	Z_INVERT_ENABLE
 
-#define	E_STEP_PIN						DIO17
-#define	E_DIR_PIN							DIO16
+//#define	E_STEP_PIN						DIO17
+//#define	E_DIR_PIN							DIO16
+#define MOTOR_OVER_INTERCOM
 //#define E_ENABLE_PIN					xxxx
-//#define	E_INVERT_DIR
+#define	E_INVERT_DIR
 
 #define	SD_CARD_DETECT				DIO2
 #define	SD_WRITE_PROTECT			DIO3
@@ -327,6 +328,10 @@ DEFINE_TEMP_SENSOR(bed,			TT_INTERCOM,	1,		0)
 #define HEATER_BED 1
 // #define HEATER_FAN HEATER_fan
 
+/** \def FAN_INTERCOM 
+        This allows to control a fan attached to the extruder board, through intercom.
+*/
+//#define FAN_INTERCOM 1
 
 
 /***************************************************************************\
@@ -373,6 +378,36 @@ DEFINE_TEMP_SENSOR(bed,			TT_INTERCOM,	1,		0)
 */
 // #define	DEBUG
 
+/*
+     debug modes:
+     
+     1 blink a led
+     2 debug RX (use 3 on other side)
+     3 debug TX (use 2 on other side)
+     4 debug SERIAL
+     5 debug TX modified
+   
+*/
+//#define DEBUG_MODE 3
+
+/** \def DEBUG_LED_FEATURE
+                this activate some nice led blinking with various patterns during startup, pauses (G4 Pxxx), temperature waits (M109 Sxxx) and possibly other moments.
+*/            
+#define DEBUG_LED_FEATURE
+
+
+/** \def ALWAYS_ON
+                this keeps the ATX power supply always on. Useful when the standby state of the power switch has bad consequences on your boards (reboots, hangs..).
+                
+                Usually you want to keep commented to save power.
+*/
+#define ALWAYS_ON
+
+/** \def REST_TIME
+                this cause the printer to stop printing for one minute after REST_TIME seconds of printing. Activate DEBUG_LED_FEATURE to see when the machine is resting. 
+                Useful if boards or power switch are overheating, keep commented if you have no problems.
+*/
+#define REST_TIME 360
 /** \def BANG_BANG
 	BANG_BANG
 		drops PID loop from heater control, reduces code size significantly (1300 bytes!)

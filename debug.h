@@ -18,5 +18,9 @@
 
 extern volatile uint8_t	debug_flags;
 
+#ifdef DEBUG_MODE
+void debug_modes_start();
+#endif
+
 #endif	/* _DEBUG_H */
 
