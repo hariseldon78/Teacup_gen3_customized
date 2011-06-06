@@ -17,7 +17,7 @@ extern uint16_t debug_led_pattern;
 #define debug_led_init() do {} while(0)
 #define debug_led_step() do {} while(0)
 #define debug_led_set_pattern( x, y ) do {} while(0)
-#defin debug_led_pattern 0
+#define debug_led_pattern 0
 
 #endif
 
