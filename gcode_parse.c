@@ -350,9 +350,16 @@ void gcode_parse_char(uint8_t c) {
 				#endif
 				) {
 				// process
+				#ifdef DEBUG
+				sersendf_P(PSTR("received line %lu\n"),next_target.N);
+				#endif
 				serial_writestr_P(PSTR("ok "));
 				process_gcode_command();
 				serial_writechar('\n');
+				#ifdef DEBUG
+				print_queue();
+				serial_writechar('\n');
+				#endif
 
 				// expect next line number
 				if (next_target.seen_N == 1)

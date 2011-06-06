@@ -95,5 +95,14 @@ void debug_modes_start() {
                 delay_ms(2000);
         }
 #endif
+#if DEBUG_MODE == 6
+        serial_init();
+        for(;;){
+             	if (serial_rxchars() != 0) {
+                        uint8_t c = serial_popchar();
+                        sersendf_P(PSTR("%su\n"),c+1);
+                }
+        }
+#endif
 }
 #endif

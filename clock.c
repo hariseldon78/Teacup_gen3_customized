@@ -28,6 +28,12 @@
 uint32_t seconds_counter=0;
 #ifdef REST_TIME
 uint32_t working_seconds=0;
+uint32_t idle_seconds=0;
+
+void reset_idle()
+{
+	idle_seconds=0;
+}
 #endif
 
 uint32_t seconds_from_boot()
@@ -49,10 +55,13 @@ void clock_250ms() {
                 MEMORY_BARRIER();
                 SREG = save_reg;
         }
+        
+#ifdef	TEMP_INTERCOM
+        start_send();
+#endif
 
         ifclock(clock_flag_1s) {
-		#ifdef DEBUG		
-		sersendf_P(PSTR("1s"));
+                if (DEBUG_POSITION && (debug_flags & DEBUG_CLOCK)) sersendf_P(PSTR("1s"));
                 if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
                         // current position
                         sersendf_P(PSTR("Pos: %ld,%ld,%ld,%ld,%lu\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F);
@@ -66,37 +75,24 @@ void clock_250ms() {
                         // newline
                         serial_writechar('\n');
                 }
-                #endif
 
                 check_temp_achieved();
-		#ifdef DEBUG		
-		sersendf_P(PSTR("t"));
-                #endif
+                if (DEBUG_POSITION && (debug_flags & DEBUG_CLOCK)) sersendf_P(PSTR("t"));
                 
-                #ifdef ALWAYS_ON
-                power_on();
-                #endif
-		#ifdef DEBUG		
-		sersendf_P(PSTR("p"));
-                #endif
                 
                 ++seconds_counter;
                 
                 #if defined REST_TIME
-                // todo: increase only when effectively working... 
-                ++working_seconds;
+                
+                if (++idle_seconds>60)
+                	working_seconds=0;
+               	else
+	                ++working_seconds;
                 #endif
-		#ifdef DEBUG		
-		sersendf_P(PSTR("r\n"));
-                #endif
+
+                if (DEBUG_POSITION && (debug_flags & DEBUG_CLOCK)) sersendf_P(PSTR("r\n"));
         }
         
-
-#ifdef	TEMP_INTERCOM
-        start_send();
-#endif
-
-
 }
 
 /*! do stuff every 10 milliseconds

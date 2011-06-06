@@ -1,9 +1,10 @@
 #!/bin/bash
 
-DEV=/dev/arduino
+#DEV=/dev/arduino
+DEV=/dev/ttyUSB0
 BAUD=115200
 
-waitfor avrdude
+#waitfor avrdude
 stty $BAUD raw ignbrk -hup -echo ixon < $DEV
 
 (

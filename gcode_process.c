@@ -86,6 +86,7 @@ void process_gcode_command() {
 	uint32_t	backup_f;
 
         #if defined REST_TIME
+        reset_idle();
         if (working_seconds>REST_TIME) {
 		#ifdef DEBUG                
 		sersendf_P(PSTR("RESTING TIME"));
@@ -590,9 +591,13 @@ void process_gcode_command() {
 				//? For example, the machine returns a string such as:
 				//?
 				//? <tt>ok C: X:0.00 Y:0.00 Z:0.00 E:0.00</tt>
-				sersendf_P(PSTR("X:%lq,Y:%lq,Z:%lq,E:%lq,F:%ld"), current_position.X * ((int32_t) UM_PER_STEP_X), current_position.Y * ((int32_t) UM_PER_STEP_Y), current_position.Z * ((int32_t) UM_PER_STEP_Z), current_position.E * ((int32_t) UM_PER_STEP_E), current_position.F);
- 				// newline is sent from gcode_parse after we return
-				break;//? ==== M114: Get Current Position ====
+				sersendf_P(PSTR("X:%lq,"), current_position.X * ((int32_t) UM_PER_STEP_X));
+				sersendf_P(PSTR("Y:%lq,"), current_position.Y * ((int32_t) UM_PER_STEP_Y));
+				sersendf_P(PSTR("Z:%lq,"), current_position.Z * ((int32_t) UM_PER_STEP_Z));
+				sersendf_P(PSTR("E:%lq,"), current_position.E * ((int32_t) UM_PER_STEP_E));
+				sersendf_P(PSTR("F:%ld"), current_position.F);
+				// newline is sent from gcode_parse after we return
+				break;
 			// M115- capabilities string
 			case 115:
 				//? ==== M115: Get Firmware Version and Capabilities ====
@@ -778,20 +783,56 @@ void process_gcode_command() {
 				serial_writestr_P(PSTR("POSITION on"));
 				// newline is sent from gcode_parse after we return
 				break;
+			case 246:
+				debug_flags &= ~DEBUG_CLOCK;
+				serial_writestr_P(PSTR("CLOCK off"));
+				// newline is sent from gcode_parse after we return
+				break;
+				// M241- echo on
+			case 247:
+				debug_flags |= DEBUG_CLOCK;
+				serial_writestr_P(PSTR("CLOCK on"));
+				// newline is sent from gcode_parse after we return
+				break;
+			case 249:
+				debug_flags = 0;
+				serial_writestr_P(PSTR("DEBUG off"));
+				// newline is sent from gcode_parse after we return
+				break;
+
 
 			// DEBUG: return current position, end position, queue
 			case 250:
 				//? ==== M250: return current position, end position, queue ====
 				//? Undocumented
 				//? This command is only available in DEBUG builds.
-				sersendf_P(PSTR("{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lu}\t{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lu}\t"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F, /*movebuffer[mb_tail].c*/0, movebuffer[mb_tail].endpoint.X, movebuffer[mb_tail].endpoint.Y, movebuffer[mb_tail].endpoint.Z, movebuffer[mb_tail].endpoint.E, movebuffer[mb_tail].endpoint.F,
+				sersendf_P(PSTR("{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lq}\t{X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,c:%lq}\n"), current_position.X, current_position.Y, current_position.Z, current_position.E, current_position.F, 
 					#ifdef ACCELERATION_REPRAP
 						movebuffer[mb_tail].end_c
 					#else
-						/*movebuffer[mb_tail].c*/
-                                                0
+						movebuffer[mb_tail].c_min
+					#endif
+						, movebuffer[mb_tail].endpoint.X, movebuffer[mb_tail].endpoint.Y, movebuffer[mb_tail].endpoint.Z, movebuffer[mb_tail].endpoint.E, movebuffer[mb_tail].endpoint.F,
+					#ifdef ACCELERATION_REPRAP
+						movebuffer[mb_tail].end_c
+					#else
+						movebuffer[mb_tail].c_min
 					#endif
 					);
+				uint8_t i=mb_tail;
+				for(;i!=mb_head;i=(i+1) % MOVEBUFFER_SIZE)
+				{
+					sersendf_P(PSTR("Q[%su]={X:%ld,Y:%ld,Z:%ld,E:%ld,F:%lu,"), 
+						i,
+						movebuffer[i].endpoint.X, movebuffer[i].endpoint.Y, movebuffer[i].endpoint.Z, movebuffer[i].endpoint.E, movebuffer[i].endpoint.F);
+					sersendf_P(PSTR("c:%lq}\n"),
+					#ifdef ACCELERATION_REPRAP
+						movebuffer[i].end_c
+					#else
+						movebuffer[i].c_min
+					#endif
+					);
+				}
 
 				print_queue();
 				break;
