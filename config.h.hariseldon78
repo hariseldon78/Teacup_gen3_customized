@@ -74,17 +74,17 @@
 /// used for G0 rapid moves and as a cap for all other feedrates
 #define	MAXIMUM_FEEDRATE_X		600
 #define	MAXIMUM_FEEDRATE_Y		600
-#define	MAXIMUM_FEEDRATE_Z		200
-#define	MAXIMUM_FEEDRATE_E		400
+#define	MAXIMUM_FEEDRATE_Z		80
+#define	MAXIMUM_FEEDRATE_E		150
 
 /// used when searching endstops and as default feedrate
 #define	SEARCH_FEEDRATE_X			200
 #define	SEARCH_FEEDRATE_Y			200
-#define	SEARCH_FEEDRATE_Z			80
+#define	SEARCH_FEEDRATE_Z			50
 // no SEARCH_FEEDRATE_E, as E can't be searched
 
 /// this is how many steps to suck back the filament by when we stop. set to zero to disable
-#define	E_STARTSTOP_STEPS			5
+#define	E_STARTSTOP_STEPS			0
 
 
 /**
@@ -208,8 +208,10 @@
 /** \def ALWAYS_CHECK_Z_MIN
 	Check the z min stopper everytime it's pushing down. Can slow down the step routine, 
 	so use it only while debugging
+	
+	NOTE: still experimental, wait for more testing please!
 */	
-#define ALWAYS_CHECK_Z_MIN
+//#define ALWAYS_CHECK_Z_MIN
 
 
 //#define	E_STEP_PIN						DIO17
