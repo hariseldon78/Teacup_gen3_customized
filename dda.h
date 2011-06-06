@@ -136,6 +136,10 @@ extern TARGET startpoint;
 /// current_position holds the machine's current position. this is only updated when we step, or when G92 (set home) is received.
 extern TARGET current_position;
 
+#if defined ALWAYS_CHECK_Z_MIN && defined Z_MIN_PIN
+/// z_min_stopper has been pushed!
+extern uint8_t z_min_pushed_flag;
+#endif
 /*
 	methods
 */

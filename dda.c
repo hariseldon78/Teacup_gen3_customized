@@ -44,6 +44,11 @@ TARGET current_position __attribute__ ((__section__ (".bss")));
 /// \brief numbers for tracking the current state of movement
 MOVE_STATE move_state __attribute__ ((__section__ (".bss")));
 
+#if defined ALWAYS_CHECK_Z_MIN && defined Z_MIN_PIN
+uint8_t z_min_denoise_count=0;
+uint8_t z_min_pushed_flag=0;
+#endif
+
 /*
 	utility functions
 */
@@ -473,15 +478,32 @@ void dda_step(DDA *dda) {
 		}
 	}
 
-	if ((move_state.z_steps) /* &&
+	if ((move_state.z_steps)
+	 /* &&
 			(z_max() != dda->z_direction) && (z_min() == dda->z_direction) */) {
-		move_state.z_counter -= dda->z_delta;
-		if (move_state.z_counter < 0) {
-			z_step();
-			did_step = 1;
-			move_state.z_steps--;
-			move_state.z_counter += dda->total_steps;
+	#if defined ALWAYS_CHECK_Z_MIN && defined Z_MIN_PIN
+               	if (!dda->z_direction && z_min())
+		        z_min_denoise_count++;
+		else
+		        z_min_denoise_count = 0;
+		
+		if (dda->z_direction || z_min_denoise_count<8) {
+	#endif
+			move_state.z_counter -= dda->z_delta;
+			if (move_state.z_counter < 0) {
+				z_step();
+				did_step = 1;
+				move_state.z_steps--;
+				move_state.z_counter += dda->total_steps;
+			}
+	#if defined ALWAYS_CHECK_Z_MIN && defined Z_MIN_PIN
 		}
+		else 
+		{
+			z_min_pushed_flag=1;
+			move_state.z_steps=0;
+		}
+	#endif
 	}
 
 	if (move_state.e_steps) {
