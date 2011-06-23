@@ -91,6 +91,13 @@ void clock_250ms() {
                 #endif
 
                 if (DEBUG_POSITION && (debug_flags & DEBUG_CLOCK)) sersendf_P(PSTR("r\n"));
+                
+                #if defined ALWAYS_CHECK_Z_MIN && defined Z_MIN_PIN
+		if (z_min_pushed_flag) {
+			sersendf_P(PSTR("ALERT!! PUSHING UNDERGROUND!!\n"));
+			z_min_pushed_flag=0;
+		}
+		#endif
         }
         
 }

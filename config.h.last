@@ -128,10 +128,10 @@
 	acceleration and deceleration ramping.
 		Each movement starts at (almost) no speed, linearly accelerates to target speed and decelerates just in time to smoothly stop at the target. alternative to ACCELERATION_REPRAP
 */
-//#define ACCELERATION_RAMPING
+#define ACCELERATION_RAMPING
 /// how fast to accelerate when using ACCELERATION_RAMPING, given in mm/s^2
 /// decimal allowed, useful range 1. to 10'000, typical range 10. to 100.
-//#define ACCELERATION 100
+#define ACCELERATION 50
 
 
 /** \def ACCELERATION_TEMPORAL
@@ -237,14 +237,14 @@
 	TEMP_HYSTERESIS: actual temperature must be target +/- hysteresis before target temperature can be achieved.
 	Unit is degree Celsius.
 */
-#define	TEMP_HYSTERESIS				8
+#define	TEMP_HYSTERESIS				6
 
 /**
 	TEMP_RESIDENCY_TIME: actual temperature must be close to target for this long before target is achieved
 
 	temperature is "achieved" for purposes of M109 and friends when actual temperature is within [hysteresis] of target for [residency] seconds
 */
-#define	TEMP_RESIDENCY_TIME		15
+#define	TEMP_RESIDENCY_TIME		20
 
 // which temperature sensors are you using? (intercom is the gen3-style separate extruder board)
 // #define	TEMP_MAX6675
@@ -369,7 +369,7 @@ DEFINE_TEMP_SENSOR(bed,		TT_INTERCOM,	1,		0)
 		Redundant when using RepRap Host for sending GCode, but mandatory when sending GCode files with a plain terminal emulator, like GtkTerm (Linux), CoolTerm (Mac) or HyperTerminal (Windows).
 		Can also be set in Makefile
 */
-//#define	XONXOFF
+#define	XONXOFF
 
 
 
@@ -416,7 +416,7 @@ DEFINE_TEMP_SENSOR(bed,		TT_INTERCOM,	1,		0)
                 this cause the printer to stop printing for one minute after REST_TIME seconds of printing. Activate DEBUG_LED_FEATURE to see when the machine is resting. 
                 Useful if boards or power switch are overheating, keep commented if you have no problems.
 */
-#define REST_TIME 900
+#define REST_TIME 2400
 
 /** \def BANG_BANG
 	BANG_BANG
