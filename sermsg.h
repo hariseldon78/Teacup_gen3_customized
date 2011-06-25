@@ -23,3 +23,4 @@ void serwrite_int32_vf(int32_t v, uint8_t fp);
 
 #endif	/* _SERMSG_H */
 
+

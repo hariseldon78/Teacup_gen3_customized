@@ -88,9 +88,9 @@ void process_gcode_command() {
         #if defined REST_TIME
         reset_idle();
         if (working_seconds>REST_TIME) {
-		#ifdef DEBUG                
+//		#ifdef DEBUG                
 		sersendf_P(PSTR("RESTING TIME"));
-		#endif
+//		#endif
                 working_seconds=0;
                 queue_wait();
 		// delay
@@ -188,6 +188,9 @@ void process_gcode_command() {
 				//?
 				//? Go in a straight line from the current (X, Y) point to the point (90.6, 13.8), extruding material as the move happens from the current extruded length to a length of 22.4 mm.
 				enqueue(&next_target.target);
+				#ifdef DEBUG
+				print_queue();
+				#endif
 				break;
 
 				//	G2 - Arc Clockwise
@@ -373,9 +376,16 @@ void process_gcode_command() {
 				break;
 
                                 // G163 - Home sweet home
-                                case 163:
-                                        home_all();
-                                        break;
+			case 163:
+                                // wait for all moves to complete
+				queue_wait();
+
+                                home_all();
+				zero_x();
+				zero_y();
+				zero_z();
+
+                                break;
 				// unknown gcode: spit an error
 			default:
 				sersendf_P(PSTR("E: Bad G-code %d"), next_target.G);
@@ -868,3 +878,4 @@ void process_gcode_command() {
 		} // switch (next_target.M)
 	} // else if (next_target.seen_M)
 } // process_gcode_command()
+

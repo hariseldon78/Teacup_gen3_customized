@@ -71,7 +71,7 @@ void home_x_negative() {
         }
 
         // set X home
-        startpoint.X = current_position.X = 0;
+        startpoint.X = current_position.X = (int32_t) (X_MIN * STEPS_PER_MM_X);;
 #endif
 }
 
@@ -162,7 +162,7 @@ void home_y_negative() {
         }
 
         // set Y home
-        startpoint.Y = current_position.Y = 0;
+        startpoint.Y = current_position.Y = (int32_t) (Y_MIN * STEPS_PER_MM_Y);
 #endif
 }
 
@@ -253,7 +253,7 @@ void home_z_negative() {
         }
 
         // set Z home
-        startpoint.Z = current_position.Z = 0;
+        startpoint.Z = current_position.Z = (int32_t) (Z_MIN * STEPS_PER_MM_Z);
         z_disable();
 #endif
 }
@@ -308,5 +308,6 @@ void home_z_positive() {
         enqueue(&t);
 #endif
 }
+
 
 

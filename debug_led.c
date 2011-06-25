@@ -40,3 +40,4 @@ void debug_led_set_pattern(uint16_t pattern, uint8_t ticks)
 }
 
 #endif
+

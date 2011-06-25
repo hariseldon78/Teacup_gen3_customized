@@ -184,27 +184,27 @@ void temp_sensor_tick() {
                                                                 sersendf_P(PSTR("pin:%d Raw ADC:%d table entry: %d"),temp_sensors[i].temp_pin,temp,j);
 #endif
                                                         // Linear interpolating temperature value
-                                                        // y = ((x - x���)y��� + (x���-x)y��� ) / (x��� - x���)
+                                                        // y = ((x - x*********)y********* + (x*********-x)y********* ) / (x********* - x*********)
                                                         // y = temp
                                                         // x = ADC reading
-                                                        // x���= temptable[j-1][0]
-                                                        // x���= temptable[j][0]
-                                                        // y���= temptable[j-1][1]
-                                                        // y���= temptable[j][1]
+                                                        // x*********= temptable[j-1][0]
+                                                        // x*********= temptable[j][0]
+                                                        // y*********= temptable[j-1][1]
+                                                        // y*********= temptable[j][1]
                                                         // y =
                                                         // Wikipedia's example linear interpolation formula.
                                                         temp = (
-                                                        //     ((x - x���)y���
+                                                        //     ((x - x*********)y*********
                                                         ((uint32_t)temp - pgm_read_word(&(temptable[table_num][j-1][0]))) * pgm_read_word(&(temptable[table_num][j][1]))
                                                                 //                 +
                                                         +
-                                                                //                   (x���-x)
+                                                                //                   (x*********-x)
                                                         (pgm_read_word(&(temptable[table_num][j][0])) - (uint32_t)temp)
-                                                                //                         y��� )
+                                                                //                         y********* )
                                                         * pgm_read_word(&(temptable[table_num][j-1][1])))
                                                                 //                              /
                                                                 /
-                                                                //                                (x��� - x���)
+                                                                //                                (x********* - x*********)
                                                                 (pgm_read_word(&(temptable[table_num][j][0])) - pgm_read_word(&(temptable[table_num][j-1][0])));
 #ifndef	EXTRUDER
                                                         if (DEBUG_PID && (debug_flags & DEBUG_PID))
@@ -359,6 +359,7 @@ void temp_print_all_sensors() {
                 sersendf_P(PSTR("sensor %su : current=%u target=%u residency=%u\n"),i, (uint16_t)temp_sensors_runtime[i].last_read_temp, (uint16_t)temp_sensors_runtime[i].target_temp,(uint16_t)temp_sensors_runtime[i].temp_residency);
         sersendf_P(PSTR("temp_achieved()=%sd"),temp_achieved());
 }
+
 
 
 
