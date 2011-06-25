@@ -372,14 +372,21 @@ DEFINE_TEMP_SENSOR(bed,		TT_INTERCOM,	1,		0)
 /**
 	Baud rate for the connection to the host. Usually 115200, other common values are 19200, 38400 or 57600.
 */
-#define	BAUD	57600
+#define	BAUD	19200
 
 /** \def XONXOFF
 	Xon/Xoff flow control.
 		Redundant when using RepRap Host for sending GCode, but mandatory when sending GCode files with a plain terminal emulator, like GtkTerm (Linux), CoolTerm (Mac) or HyperTerminal (Windows).
 		Can also be set in Makefile
 */
-#define	XONXOFF
+//#define	XONXOFF
+
+/** \def OK_WHEN_IDLE
+	Sends an ok message each OK_WHEN_IDLE seconds of idle time, trying to resolve some print stopping problems
+	
+			*/
+
+#define OK_WHEN_IDLE	20
 
 
 

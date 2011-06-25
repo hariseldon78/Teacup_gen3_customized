@@ -6,7 +6,7 @@
 #define	_PINIO_H
 
 #include	"config.h"
-
+#include 	"clock.h"
 #ifndef	X_INVERT_ENABLE
 	#define	X_INVERT_ENABLE 0
 #endif
@@ -169,7 +169,7 @@ End Step - All Steppers
 (so we don't have to delay in interrupt context)
 */
 
-#define unstep() 							do { _x_step(0); _y_step(0); _z_step(0); _e_step(0); } while (0)
+#define unstep() 							do { _x_step(0); _y_step(0); _z_step(0); _e_step(0); reset_idle();} while (0)
 
 /*
 Stepper Enable Pins

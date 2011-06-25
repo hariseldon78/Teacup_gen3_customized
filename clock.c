@@ -26,15 +26,16 @@
  */
  
 uint32_t seconds_counter=0;
-#ifdef REST_TIME
 uint32_t working_seconds=0;
 uint32_t idle_seconds=0;
+#ifdef OK_WHEN_IDLE
+uint32_t last_ok_time=0;
+#endif
 
 void reset_idle()
 {
 	idle_seconds=0;
 }
-#endif
 
 uint32_t seconds_from_boot()
 {
@@ -82,14 +83,19 @@ void clock_250ms() {
                 
                 ++seconds_counter;
                 
-                #if defined REST_TIME
-                
                 if (++idle_seconds>60)
                 	working_seconds=0;
                	else
 	                ++working_seconds;
-                #endif
-
+                #ifdef OK_WHEN_IDLE
+		if (idle_seconds>OK_WHEN_IDLE && seconds_counter-last_ok_time>OK_WHEN_IDLE)
+		{
+			sersendf_P(PSTR("ok (idle)\n"));
+			last_ok_time=seconds_counter;
+		}
+		#endif 
+		
+		
                 if (DEBUG_POSITION && (debug_flags & DEBUG_CLOCK)) sersendf_P(PSTR("r\n"));
                 
                 #if defined ALWAYS_CHECK_Z_MIN && defined Z_MIN_PIN

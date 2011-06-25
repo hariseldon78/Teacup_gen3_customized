@@ -203,6 +203,8 @@ void check_temp_achieved() {
         if (current_movebuffer->live) {
                 if (current_movebuffer->waitfor_temp) {
                         //	setTimer(HEATER_WAIT_TIMEOUT);
+                        reset_idle();
+                        
                         if (temp_achieved()) {
                                 current_movebuffer->live = current_movebuffer->waitfor_temp = 0;
                                 serial_writestr_P(PSTR("Temp achieved\n"));
