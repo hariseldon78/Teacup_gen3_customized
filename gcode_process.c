@@ -217,6 +217,7 @@ void process_gcode_command() {
 						clock_10ms();
 					}
 					delay_ms(1);
+					reset_idle();
 				}
                                 debug_led_set_pattern(0,0);
 				break;

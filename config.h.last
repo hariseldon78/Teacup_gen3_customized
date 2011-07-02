@@ -61,8 +61,8 @@
 #define	STEPS_PER_MM_Z				833.398
 
 /// http://blog.arcol.hu/?p=157 may help with this one
-#define	STEPS_PER_MM_E				44
-
+//#define	STEPS_PER_MM_E				44
+#define	STEPS_PER_MM_E				22
 
 /*
 	Values depending on the capabilities of your stepper motors and other mechanics.
@@ -72,10 +72,10 @@
 */
 
 /// used for G0 rapid moves and as a cap for all other feedrates
-#define	MAXIMUM_FEEDRATE_X		600
-#define	MAXIMUM_FEEDRATE_Y		600
+#define	MAXIMUM_FEEDRATE_X		900
+#define	MAXIMUM_FEEDRATE_Y		900
 #define	MAXIMUM_FEEDRATE_Z		80
-#define	MAXIMUM_FEEDRATE_E		170
+#define	MAXIMUM_FEEDRATE_E		400
 
 /// used when searching endstops and as default feedrate
 #define	SEARCH_FEEDRATE_X			200
@@ -105,8 +105,8 @@
 #define	X_MIN			-86.5
 #define	X_MAX			86.5
 
-#define	Y_MIN			-72.0
-#define	Y_MAX			72.0
+#define	Y_MIN			-76.0
+#define	Y_MAX			98.0
 
 #define	Z_MIN			0.0
 #define	Z_MAX			80.0
@@ -247,7 +247,7 @@
 	TEMP_HYSTERESIS: actual temperature must be target +/- hysteresis before target temperature can be achieved.
 	Unit is degree Celsius.
 */
-#define	TEMP_HYSTERESIS				6
+#define	TEMP_HYSTERESIS				5
 
 /**
 	TEMP_RESIDENCY_TIME: actual temperature must be close to target for this long before target is achieved

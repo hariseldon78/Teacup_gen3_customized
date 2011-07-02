@@ -19,21 +19,18 @@ void home_all() {
 #elif defined Z_MAX_PIN
         home_z_positive();
 #endif
-        reset_idle();
-
-#if defined	X_MIN_PIN
-        home_x_negative();
-#elif defined X_MAX_PIN
-        home_x_positive();
-#endif
-        reset_idle();
 
 #if defined	Y_MIN_PIN
         home_y_negative();
 #elif defined Y_MAX_PIN
         home_y_positive();
 #endif
-        reset_idle();
+
+#if defined	X_MIN_PIN
+        home_x_negative();
+#elif defined X_MAX_PIN
+        home_x_positive();
+#endif
 }
 
 /// find X MIN endstop
